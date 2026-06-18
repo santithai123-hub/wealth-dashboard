@@ -142,7 +142,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Net Worth</div>
-                        <div class="text-2xl xl:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-total-value">
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-value">
                             ฿0.00
                         </div>
                         <div class="flex justify-between text-xs mt-auto pt-3 border-t border-gray-800">
@@ -151,20 +151,20 @@
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Profit / Loss</div>
-                        <div class="text-2xl xl:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-total-pl">
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-pl">
                             ฿0.00
                         </div>
                         <div class="text-sm font-mono font-medium mt-auto" id="dash-total-pl-pct">0.00%</div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Top Performing Asset</div>
-                        <div class="text-xl md:text-2xl font-bold mb-2 text-accent whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-top-asset">None</div>
+                        <div class="text-lg sm:text-xl md:text-2xl font-bold mb-2 text-accent whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-top-asset">None</div>
                         <div class="text-sm text-gray-400 mt-auto">Based on current PnL</div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col">
                         <div class="absolute right-0 top-0 opacity-10"><i data-lucide="pie-chart" class="w-24 h-24"></i></div>
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider z-10">Asset Count</div>
-                        <div class="text-3xl font-mono font-bold text-gray-200 mb-2 z-10" id="dash-asset-count">0</div>
+                        <div class="text-2xl sm:text-3xl font-mono font-bold text-gray-200 mb-2 z-10" id="dash-asset-count">0</div>
                         <div class="text-xs text-gray-400 mt-auto z-10">Total tracked positions</div>
                     </div>
                 </div>
@@ -261,7 +261,7 @@
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Current Total Net Wealth</label>
-                            <div class="text-xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
+                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Monthly Expenses Target (THB)</label>
@@ -646,7 +646,7 @@
             const pnlStr = `${pnl >= 0 ? '+' : ''}฿${formatNum(pnl, 2)}`;
             plEl.innerText = pnlStr;
             plEl.title = pnlStr;
-            plEl.className = `text-2xl xl:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar ${pnl >= 0 ? 'text-profit' : 'text-loss'}`;
+            plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${pnl >= 0 ? 'text-profit' : 'text-loss'}`;
             plPctEl.innerText = `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`;
             plPctEl.className = `text-sm font-mono font-medium ${pnl >= 0 ? 'text-profit' : 'text-loss'}`;
 
@@ -841,7 +841,7 @@
             }
         }
 
-        // --- CSV EXPORT AND IMPORT ---
+        // --- CSV EXPORT AND IMPORT (ROBUST MOBILE VERSION) ---
         function exportCSV() {
             if(state.transactions.length === 0) {
                 showToast("No transactions to export", "error");
@@ -853,7 +853,7 @@
                 csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
             });
             
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
@@ -872,7 +872,13 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const lines = evt.target.result.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    // Fix 2: Robust string cleanup for mobile text editors/messengers
+                    let rawText = evt.target.result;
+                    // Replace all types of line breaks with a standard \n
+                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    
+                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    
                     if (lines.length <= 1) {
                         showToast("No transaction rows found.", "error");
                         return;
@@ -882,7 +888,9 @@
                     let parsedTransactions = [];
 
                     for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',');
+                        // Handle CSV lines that might have weird hidden spaces or quotes
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
+                        
                         if (row.length >= 6) {
                             parsedTransactions.push({
                                 id: 'import_' + Date.now() + i,
@@ -909,6 +917,7 @@
                         showToast("No valid rows found to import.", "error");
                     }
                 } catch (err) { 
+                    console.error(err);
                     showToast("Failed to parse CSV. Check format.", "error"); 
                 }
                 document.getElementById('csv-upload').value = ''; 
@@ -1067,7 +1076,7 @@
             if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
         }
 
-        // --- DATA MANAGEMENT ---
+        // --- DATA MANAGEMENT (ROBUST MOBILE VERSION) ---
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             const downloadAnchorNode = document.createElement('a');
@@ -1084,7 +1093,15 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const obj = JSON.parse(evt.target.result);
+                    // Fix 1: Strip out potential invisible corruption characters added by mobile OS file transfers
+                    let rawData = evt.target.result.trim();
+                    // Remove invisible BOM (Byte Order Mark) if it exists
+                    if (rawData.charCodeAt(0) === 0xFEFF) {
+                        rawData = rawData.slice(1);
+                    }
+                    
+                    const obj = JSON.parse(rawData);
+                    
                     if(obj.transactions) state.transactions = obj.transactions;
                     if(obj.customPrices) state.customPrices = obj.customPrices;
                     
@@ -1095,7 +1112,8 @@
                     const activeView = document.querySelector('.view-section.active');
                     if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
                 } catch(err) {
-                    showToast('Invalid backup file', 'error');
+                    console.error("JSON Parse Error:", err);
+                    showToast('Invalid backup file. Parse failed.', 'error');
                 }
             };
             reader.readAsText(file);
@@ -1158,11 +1176,11 @@
             
             const icon = document.getElementById('toast-icon');
             if(type === 'success') {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
                 icon.setAttribute('data-lucide', 'check-circle');
                 icon.className = "text-accent";
             } else {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
                 icon.setAttribute('data-lucide', 'alert-circle');
                 icon.className = "text-loss";
             }
