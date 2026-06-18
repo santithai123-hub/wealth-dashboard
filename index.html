@@ -1,4 +1,4 @@
-html_content = <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -894,7 +894,7 @@ html_content = <!DOCTYPE html>
                     
                     // Defense against LINE encryption
                     if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
-                        alert("FILE ERROR: Your messaging app (like LINE or WhatsApp) encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
+                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
                         document.getElementById('csv-upload').value = ''; 
                         return;
                     }
@@ -1118,7 +1118,7 @@ html_content = <!DOCTYPE html>
                     
                     // Defense against LINE encryption
                     if(rawData.includes("MSMAMARPCRYPT") || rawData.includes("AES/CBC")) {
-                        alert("FILE ERROR: Your messaging app (like LINE or WhatsApp) encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
+                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
                         document.getElementById('json-upload-backup').value = '';
                         return;
                     }
@@ -1147,10 +1147,11 @@ html_content = <!DOCTYPE html>
         // --- DATA MANAGEMENT (TEXT SYNC FOR MOBILE) ---
         function copyDataText() {
             try {
-                // Compress state into safe string
-                const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+                // Highly robust encoding to support Thai characters and emojis
+                const jsonString = JSON.stringify(state);
+                const encodedString = encodeURIComponent(jsonString);
+                const dataStr = btoa(encodedString);
                 
-                // Fallback method for older browsers / iframe restrictions
                 const textArea = document.createElement("textarea");
                 textArea.value = dataStr;
                 document.body.appendChild(textArea);
@@ -1160,6 +1161,7 @@ html_content = <!DOCTYPE html>
                 
                 showToast("Data Copied! Paste this text into LINE to send to your phone.");
             } catch (err) {
+                console.error(err);
                 showToast("Failed to copy data string.", "error");
             }
         }
@@ -1169,7 +1171,9 @@ html_content = <!DOCTYPE html>
             if (!input) return;
             
             try {
-                const jsonStr = decodeURIComponent(escape(atob(input.trim())));
+                // Decode string robustly
+                const decodedString = atob(input.trim());
+                const jsonStr = decodeURIComponent(decodedString);
                 const obj = JSON.parse(jsonStr);
                 
                 if(obj.transactions) state.transactions = obj.transactions;
@@ -1182,6 +1186,7 @@ html_content = <!DOCTYPE html>
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             } catch(err) {
+                console.error(err);
                 alert("Paste Error: The text you pasted is invalid. Make sure you copied the entire string.");
                 showToast("Failed to sync data.", "error");
             }
@@ -1262,7 +1267,4 @@ html_content = <!DOCTYPE html>
         window.onload = init;
     </script>
 </body>
-</html>"""
-
-with open('Wealth_Dashboard.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
+</html>
