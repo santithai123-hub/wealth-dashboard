@@ -841,7 +841,7 @@
             }
         }
 
-        // --- CSV EXPORT AND IMPORT (ROBUST MOBILE VERSION) ---
+        // --- CSV EXPORT AND IMPORT ---
         function exportCSV() {
             if(state.transactions.length === 0) {
                 showToast("No transactions to export", "error");
@@ -853,7 +853,7 @@
                 csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
             });
             
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
@@ -872,13 +872,7 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    // Fix 2: Robust string cleanup for mobile text editors/messengers
-                    let rawText = evt.target.result;
-                    // Replace all types of line breaks with a standard \n
-                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    
-                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                    
+                    const lines = evt.target.result.split('\n').map(line => line.trim()).filter(line => line.length > 0);
                     if (lines.length <= 1) {
                         showToast("No transaction rows found.", "error");
                         return;
@@ -888,9 +882,7 @@
                     let parsedTransactions = [];
 
                     for (let i = 1; i < lines.length; i++) {
-                        // Handle CSV lines that might have weird hidden spaces or quotes
-                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
-                        
+                        const row = lines[i].split(',');
                         if (row.length >= 6) {
                             parsedTransactions.push({
                                 id: 'import_' + Date.now() + i,
@@ -917,7 +909,6 @@
                         showToast("No valid rows found to import.", "error");
                     }
                 } catch (err) { 
-                    console.error(err);
                     showToast("Failed to parse CSV. Check format.", "error"); 
                 }
                 document.getElementById('csv-upload').value = ''; 
@@ -1076,7 +1067,7 @@
             if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
         }
 
-        // --- DATA MANAGEMENT (ROBUST MOBILE VERSION) ---
+        // --- DATA MANAGEMENT ---
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             const downloadAnchorNode = document.createElement('a');
@@ -1093,15 +1084,7 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    // Fix 1: Strip out potential invisible corruption characters added by mobile OS file transfers
-                    let rawData = evt.target.result.trim();
-                    // Remove invisible BOM (Byte Order Mark) if it exists
-                    if (rawData.charCodeAt(0) === 0xFEFF) {
-                        rawData = rawData.slice(1);
-                    }
-                    
-                    const obj = JSON.parse(rawData);
-                    
+                    const obj = JSON.parse(evt.target.result);
                     if(obj.transactions) state.transactions = obj.transactions;
                     if(obj.customPrices) state.customPrices = obj.customPrices;
                     
@@ -1112,8 +1095,7 @@
                     const activeView = document.querySelector('.view-section.active');
                     if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
                 } catch(err) {
-                    console.error("JSON Parse Error:", err);
-                    showToast('Invalid backup file. Parse failed.', 'error');
+                    showToast('Invalid backup file', 'error');
                 }
             };
             reader.readAsText(file);
@@ -1176,11 +1158,11 @@
             
             const icon = document.getElementById('toast-icon');
             if(type === 'success') {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
                 icon.setAttribute('data-lucide', 'check-circle');
                 icon.className = "text-accent";
             } else {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
                 icon.setAttribute('data-lucide', 'alert-circle');
                 icon.className = "text-loss";
             }
