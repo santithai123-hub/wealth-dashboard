@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html_content = """<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -288,23 +288,44 @@
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
                 <h2 class="text-2xl font-semibold">Settings & Backup</h2>
+                
+                <!-- FILE SYNC OPTIONS -->
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Data Management</h3>
-                    <p class="text-xs text-gray-400">All data is stored locally in your browser. Backup your portfolio to a JSON file to transfer devices.</p>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
+                    <p class="text-xs text-gray-400">Save and load your portfolio using JSON files. Works best on a computer or direct file transfer.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
-                            <span class="text-sm font-medium">Backup (JSON)</span>
+                            <span class="text-sm font-medium">Backup (JSON File)</span>
                         </button>
                         <div class="relative w-full">
                             <input type="file" id="json-upload-backup" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importDataJSON(event)">
                             <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700">
                                 <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400"></i>
-                                <span class="text-sm font-medium">Restore (JSON)</span>
+                                <span class="text-sm font-medium">Restore (JSON File)</span>
                             </div>
                         </div>
                     </div>
-                    <button onclick="clearAllData()" class="w-full mt-4 bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
+                </div>
+
+                <!-- TEXT SYNC OPTIONS (NEW) -->
+                <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Using Text (Mobile Friendly)</h3>
+                    <p class="text-xs text-gray-400">If file transfers via LINE/WhatsApp fail due to encryption, use Copy & Paste. Click Copy, send the text to yourself in a message, and Paste it on your phone.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
+                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
+                            <span class="text-sm font-medium">Copy Data String</span>
+                        </button>
+                        <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
+                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
+                            <span class="text-sm font-medium">Paste Data String</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl border border-gray-800">
+                    <button onclick="clearAllData()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
                         <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Wipe All Local Data
                     </button>
                 </div>
@@ -479,7 +500,6 @@
                 document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2);
                 flashUI('ui-usd-thb');
             } catch(e) { 
-                console.error('FX Fetch Failed', e); 
                 offlineMode = true;
                 document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2);
             }
@@ -512,7 +532,6 @@
                 document.getElementById('ticker-btc-usd').innerText = `$${formatNum(btcUsd, 0)}`;
                 flashUI('ui-btc-usd');
             } catch(e) { 
-                console.error('BTC Fetch Failed', e); 
                 offlineMode = true;
                 let fallbackBtcUsd = 65000;
                 market.prices['BTC'] = fallbackBtcUsd * market.usd_thb;
@@ -549,7 +568,6 @@
                 document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
                 flashUI('ui-gold');
             } catch(e) { 
-                console.error('Gold Fetch Failed', e); 
                 offlineMode = true;
                 let fallbackSpotUsd = 2350;
                 let goldThb = (fallbackSpotUsd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
@@ -853,7 +871,7 @@
                 csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
             });
             
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
@@ -872,7 +890,18 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const lines = evt.target.result.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    let rawText = evt.target.result;
+                    
+                    // Defense against LINE encryption
+                    if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
+                        alert("FILE ERROR: Your messaging app (like LINE or WhatsApp) encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
+                        document.getElementById('csv-upload').value = ''; 
+                        return;
+                    }
+
+                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    
                     if (lines.length <= 1) {
                         showToast("No transaction rows found.", "error");
                         return;
@@ -882,7 +911,8 @@
                     let parsedTransactions = [];
 
                     for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',');
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
+                        
                         if (row.length >= 6) {
                             parsedTransactions.push({
                                 id: 'import_' + Date.now() + i,
@@ -1067,7 +1097,7 @@
             if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
         }
 
-        // --- DATA MANAGEMENT ---
+        // --- DATA MANAGEMENT (FILES) ---
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
             const downloadAnchorNode = document.createElement('a');
@@ -1084,7 +1114,19 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const obj = JSON.parse(evt.target.result);
+                    let rawData = evt.target.result.trim();
+                    
+                    // Defense against LINE encryption
+                    if(rawData.includes("MSMAMARPCRYPT") || rawData.includes("AES/CBC")) {
+                        alert("FILE ERROR: Your messaging app (like LINE or WhatsApp) encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
+                        document.getElementById('json-upload-backup').value = '';
+                        return;
+                    }
+
+                    if (rawData.charCodeAt(0) === 0xFEFF) rawData = rawData.slice(1);
+                    
+                    const obj = JSON.parse(rawData);
+                    
                     if(obj.transactions) state.transactions = obj.transactions;
                     if(obj.customPrices) state.customPrices = obj.customPrices;
                     
@@ -1102,15 +1144,60 @@
             document.getElementById('json-upload-backup').value = '';
         }
 
-        function clearAllData() {
-            localStorage.removeItem('wealth_txs');
-            localStorage.removeItem('wealth_custom_prices');
-            state.transactions = [];
-            state.customPrices = {};
-            showToast('All local data wiped', 'error');
+        // --- DATA MANAGEMENT (TEXT SYNC FOR MOBILE) ---
+        function copyDataText() {
+            try {
+                // Compress state into safe string
+                const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+                
+                // Fallback method for older browsers / iframe restrictions
+                const textArea = document.createElement("textarea");
+                textArea.value = dataStr;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                showToast("Data Copied! Paste this text into LINE to send to your phone.");
+            } catch (err) {
+                showToast("Failed to copy data string.", "error");
+            }
+        }
+
+        function pasteDataText() {
+            const input = prompt("Paste your Data String here:");
+            if (!input) return;
             
-            const activeView = document.querySelector('.view-section.active');
-            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            try {
+                const jsonStr = decodeURIComponent(escape(atob(input.trim())));
+                const obj = JSON.parse(jsonStr);
+                
+                if(obj.transactions) state.transactions = obj.transactions;
+                if(obj.customPrices) state.customPrices = obj.customPrices;
+                
+                localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                showToast('Data Synced Successfully!');
+                
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            } catch(err) {
+                alert("Paste Error: The text you pasted is invalid. Make sure you copied the entire string.");
+                showToast("Failed to sync data.", "error");
+            }
+        }
+
+        function clearAllData() {
+            if(confirm("Are you sure you want to delete ALL local data? This cannot be undone.")) {
+                localStorage.removeItem('wealth_txs');
+                localStorage.removeItem('wealth_custom_prices');
+                state.transactions = [];
+                state.customPrices = {};
+                showToast('All local data wiped', 'error');
+                
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            }
         }
 
         // --- UTILS ---
@@ -1158,11 +1245,11 @@
             
             const icon = document.getElementById('toast-icon');
             if(type === 'success') {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
                 icon.setAttribute('data-lucide', 'check-circle');
                 icon.className = "text-accent";
             } else {
-                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none";
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
                 icon.setAttribute('data-lucide', 'alert-circle');
                 icon.className = "text-loss";
             }
@@ -1175,4 +1262,7 @@
         window.onload = init;
     </script>
 </body>
-</html>
+</html>"""
+
+with open('Wealth_Dashboard.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
