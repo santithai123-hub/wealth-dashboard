@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Wealth Dashboard - Update 1a</title>
+    <title>Thai Wealth Dashboard - Update 1b</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -94,7 +94,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 1a Live</span>
+            <span id="last-sync" class="opacity-70">Update 1b Live</span>
         </div>
     </aside>
 
@@ -127,7 +127,7 @@
                 <button onclick="fetchMarketData()" class="bg-gray-800 hover:bg-gray-700 text-white px-2 md:px-3 py-1.5 rounded text-xs flex items-center transition shadow border border-gray-700">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5 md:mr-1.5"></i> <span class="hidden md:inline">Refresh</span>
                 </button>
-                <button onclick="openModal('addTransactionModal')" class="bg-accent hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 rounded text-xs font-semibold flex items-center transition shadow-lg shadow-blue-500/20">
+                <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-3 md:px-4 py-1.5 rounded text-xs font-semibold flex items-center transition shadow-lg shadow-blue-500/20">
                     <i data-lucide="plus" class="w-4 h-4 md:mr-1"></i> <span class="hidden md:inline">Add Asset</span>
                 </button>
             </div>
@@ -184,11 +184,11 @@
                 </div>
                 
                 <div class="flex space-x-4 border-b border-gray-800 mb-6 overflow-x-auto hide-scrollbar">
-                    <button class="pb-2 px-2 text-sm font-medium tab-active port-tab-btn" onclick="switchPortTab('All', this)">Overview</button>
-                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" onclick="switchPortTab('Crypto', this)">Crypto</button>
-                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" onclick="switchPortTab('Gold', this)">Gold</button>
-                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" onclick="switchPortTab('SET', this)">Thai Stocks</button>
-                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" onclick="switchPortTab('Fixed', this)">Fixed/Savings</button>
+                    <button class="pb-2 px-2 text-sm font-medium tab-active port-tab-btn" data-type="All" onclick="switchPortTab('All', this)">Overview</button>
+                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" data-type="Crypto" onclick="switchPortTab('Crypto', this)">Crypto</button>
+                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" data-type="Gold" onclick="switchPortTab('Gold', this)">Gold</button>
+                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" data-type="SET" onclick="switchPortTab('SET', this)">Thai Stocks</button>
+                    <button class="pb-2 px-2 text-sm font-medium text-gray-400 hover:text-white port-tab-btn" data-type="Fixed" onclick="switchPortTab('Fixed', this)">Fixed/Savings</button>
                 </div>
                 
                 <div id="port-tab-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -270,7 +270,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1a)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1b)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
@@ -413,7 +413,7 @@
                 state.transactions = Array.isArray(parsed) ? parsed : [];
             }
         } catch(e) {
-            console.warn("Update 1a Auto-Fix: Corrupted transactions memory detected and cleared.");
+            console.warn("Update 1b Auto-Fix: Corrupted transactions memory detected and cleared.");
             localStorage.removeItem('wealth_txs');
         }
 
@@ -424,7 +424,7 @@
                 state.customPrices = (typeof parsed === 'object' && parsed !== null) ? parsed : {};
             }
         } catch(e) {
-            console.warn("Update 1a Auto-Fix: Corrupted price memory detected and cleared.");
+            console.warn("Update 1b Auto-Fix: Corrupted price memory detected and cleared.");
             localStorage.removeItem('wealth_custom_prices');
         }
 
@@ -433,10 +433,23 @@
 
         function init() {
             lucide.createIcons();
-            const dateInput = document.getElementById('txDate');
-            if(dateInput) dateInput.valueAsDate = new Date();
             fetchMarketData(); 
             nav('dashboard'); 
+        }
+
+        // --- EXPLICIT SAFE MODAL LAUNCHER (NEW in 1b) ---
+        function openAddAssetModal() {
+            try {
+                document.getElementById('txForm').reset();
+                document.getElementById('txId').value = '';
+                document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                const dateInput = document.getElementById('txDate');
+                if(dateInput) dateInput.valueAsDate = new Date();
+                openModal('addTransactionModal');
+            } catch(e) {
+                console.error("Failed to cleanly open modal:", e);
+                openModal('addTransactionModal'); // Fallback
+            }
         }
 
         // --- MOBILE SIDEBAR LOGIC ---
@@ -470,13 +483,17 @@
         }
 
         function renderCurrentView(viewId) {
-            if(viewId === 'dashboard') renderDashboard();
-            if(viewId === 'portfolio') {
-                const activeBtn = document.querySelector('.port-tab-btn.tab-active');
-                switchPortTab(activeBtn ? activeBtn.innerText.trim() : 'All');
+            try {
+                if(viewId === 'dashboard') renderDashboard();
+                if(viewId === 'portfolio') {
+                    const activeBtn = document.querySelector('.port-tab-btn.tab-active');
+                    switchPortTab(activeBtn ? activeBtn.getAttribute('data-type') : 'All');
+                }
+                if(viewId === 'transactions') renderTransactions();
+                if(viewId === 'retirement') updateRetirement();
+            } catch(e) {
+                console.error("View rendering error prevented in 1b:", e);
             }
-            if(viewId === 'transactions') renderTransactions();
-            if(viewId === 'retirement') updateRetirement();
         }
 
         // --- REAL-TIME DATA FETCHING ENGINE ---
@@ -507,7 +524,7 @@
                     btcUsd = d3.bitcoin.usd;
                 }
                 
-                if (btcUsd === null) throw new Error();
+                if (btcUsd === null || isNaN(btcUsd)) throw new Error();
 
                 market.prices['BTC'] = btcUsd * market.usd_thb;
                 document.getElementById('ticker-btc-usd').innerText = `$${formatNum(btcUsd, 0)}`;
@@ -533,7 +550,7 @@
                     spotUsd = d3['pax-gold'].usd;
                 }
                 
-                if (spotUsd === null) throw new Error();
+                if (spotUsd === null || isNaN(spotUsd)) throw new Error();
 
                 let goldThb = (spotUsd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
                 let roundedGold = Math.round(goldThb / 50) * 50;
@@ -550,10 +567,10 @@
             }
 
             if(offlineMode) {
-                document.getElementById('last-sync').innerText = `Update 1a (Offline Fallback)`;
+                document.getElementById('last-sync').innerText = `Update 1b (Offline Fallback)`;
                 showToast('Network limits reached. Using localized fallback prices.', 'error');
             } else {
-                document.getElementById('last-sync').innerText = `Update 1a - Last sync: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('last-sync').innerText = `Update 1b - Last sync: ${new Date().toLocaleTimeString()}`;
             }
             
             const activeViewEl = document.querySelector('.view-section.active');
@@ -564,20 +581,20 @@
 
         // --- VALUATION ENGINE ---
         function getAssetMarketPrice(tx) {
-            let n = tx.name.toUpperCase();
+            let n = (tx.name || "UNKNOWN").toUpperCase();
             
             if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN')) {
-                return market.prices['BTC'] > 0 ? market.prices['BTC'] : (tx.price * (tx.currency === 'USD' ? market.usd_thb : 1));
+                return market.prices['BTC'] > 0 ? market.prices['BTC'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
             }
             if (tx.type === 'Gold') {
-                return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : (tx.price * (tx.currency === 'USD' ? market.usd_thb : 1));
+                return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
             }
             
             if (state.customPrices[n]) {
                 return state.customPrices[n];
             }
             
-            return tx.price * (tx.currency === 'USD' ? market.usd_thb : 1);
+            return (parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1);
         }
 
         function calculatePortfolio() {
@@ -602,7 +619,7 @@
             let grouped = {};
             
             state.transactions.forEach(tx => {
-                let name = tx.name.toUpperCase();
+                let name = (tx.name || "UNKNOWN").toUpperCase();
                 if(!grouped[name]) grouped[name] = { cost: 0, val: 0 };
                 grouped[name].cost += ((parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1));
                 grouped[name].val += (getAssetMarketPrice(tx) * (parseFloat(tx.qty) || 0));
@@ -643,27 +660,23 @@
 
             document.getElementById('dash-top-asset').innerText = stats.topAsset;
             
-            let uniqueAssets = new Set(state.transactions.map(t => t.name.toUpperCase()));
+            let uniqueAssets = new Set(state.transactions.map(t => (t.name || "UNKNOWN").toUpperCase()));
             document.getElementById('dash-asset-count').innerText = uniqueAssets.size;
             
             renderCharts(stats);
         }
 
         function switchPortTab(filterType, btnObj = null) {
-            if(btnObj) {
-                document.querySelectorAll('.port-tab-btn').forEach(b => {
-                    b.classList.remove('tab-active');
-                    b.classList.add('text-gray-400');
-                });
-                btnObj.classList.add('tab-active');
-                btnObj.classList.remove('text-gray-400');
-            } else {
-                let btns = document.querySelectorAll('.port-tab-btn');
-                if(btns.length > 0 && filterType === 'All') {
-                    btns.forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-gray-400'); });
-                    btns[0].classList.add('tab-active');
-                    btns[0].classList.remove('text-gray-400');
-                }
+            document.querySelectorAll('.port-tab-btn').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-gray-400');
+            });
+            
+            // Re-highlight the correct button using data-type logic
+            let activeBtn = btnObj || document.querySelector(`.port-tab-btn[data-type="${filterType}"]`);
+            if(activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('text-gray-400');
             }
 
             const container = document.getElementById('port-tab-content');
@@ -678,7 +691,7 @@
 
             let grouped = {};
             filteredTxs.forEach(tx => {
-                let name = tx.name.toUpperCase();
+                let name = (tx.name || "UNKNOWN").toUpperCase();
                 let costThb = (parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let marketUnitThb = getAssetMarketPrice(tx);
                 let currentValThb = marketUnitThb * (parseFloat(tx.qty) || 0);
@@ -701,7 +714,7 @@
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h4 class="font-bold text-lg text-gray-200">${asset.name}</h4>
-                                <span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type}</span>
+                                <span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span>
                             </div>
                             <div class="text-right">
                                 <div class="text-xs text-gray-500">Total Units</div>
@@ -750,21 +763,21 @@
                 let pnl = currentValThb - costThb;
                 let pnlPct = costThb > 0 ? (pnl / costThb) * 100 : 0;
                 
-                let isAutoAsset = (tx.type === 'Crypto' && (tx.name.toUpperCase() === 'BTC')) || tx.type === 'Gold';
+                let isAutoAsset = (tx.type === 'Crypto' && ((tx.name||"").toUpperCase() === 'BTC')) || tx.type === 'Gold';
 
                 let row = `
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
-                        <td class="p-4 text-gray-400">${new Date(tx.date).toLocaleDateString()}</td>
+                        <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
                         <td class="p-4">
-                            <div class="font-bold text-gray-200">${tx.name.toUpperCase()}</div>
-                            <div class="text-[10px] text-gray-500">${tx.type}</div>
+                            <div class="font-bold text-gray-200">${(tx.name || "UNKNOWN").toUpperCase()}</div>
+                            <div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div>
                         </td>
-                        <td class="p-4 text-right">${formatNum(tx.qty, 4)}</td>
+                        <td class="p-4 text-right">${formatNum(parseFloat(tx.qty)||0, 4)}</td>
                         <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (parseFloat(tx.qty) || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
                             ${!isAutoAsset ? `
-                                <button onclick="openUpdatePrice('${tx.name}')" class="ml-2 text-gray-500 hover:text-accent" title="Manual Update">
+                                <button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent" title="Manual Update">
                                     <i data-lucide="refresh-cw" class="w-3 h-3 inline"></i>
                                 </button>
                             ` : `<span class="ml-2 text-accent text-[10px]" title="Auto-updated API">Live</span>`}
@@ -790,13 +803,13 @@
             const tx = state.transactions.find(t => t.id === id);
             if (!tx) return;
             
-            document.getElementById('txId').value = tx.id;
-            document.getElementById('txType').value = tx.type;
-            document.getElementById('txName').value = tx.name;
-            document.getElementById('txDate').value = tx.date;
-            document.getElementById('txQty').value = tx.qty;
-            document.getElementById('txPrice').value = tx.price;
-            document.getElementById('txCurrency').value = tx.currency;
+            document.getElementById('txId').value = tx.id || '';
+            document.getElementById('txType').value = tx.type || 'Crypto';
+            document.getElementById('txName').value = tx.name || '';
+            document.getElementById('txDate').value = tx.date || '';
+            document.getElementById('txQty').value = tx.qty || 0;
+            document.getElementById('txPrice').value = tx.price || 0;
+            document.getElementById('txCurrency').value = tx.currency || 'THB';
             
             document.getElementById('modal-title').innerText = "Edit Asset Transaction";
             openModal('addTransactionModal');
@@ -804,6 +817,7 @@
 
         // --- UPDATE CUSTOM PRICE LOGIC ---
         function openUpdatePrice(assetName) {
+            if(!assetName) return;
             document.getElementById('upd-asset-name').innerText = assetName.toUpperCase();
             
             const searchQuery = encodeURIComponent(`${assetName} stock price thb`);
@@ -832,92 +846,6 @@
             }
         }
 
-        // --- CSV EXPORT AND IMPORT ---
-        function exportCSV() {
-            if(state.transactions.length === 0) {
-                showToast("No transactions to export", "error");
-                return;
-            }
-            
-            let csv = "Date,Type,Name,Qty,Price,Currency\n";
-            state.transactions.forEach(t => {
-                csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'wealth_transactions.csv');
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast("CSV Exported Successfully");
-        }
-
-        function importCSV(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawText = evt.target.result;
-                    
-                    if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
-                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead.");
-                        document.getElementById('csv-upload').value = ''; 
-                        return;
-                    }
-
-                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                    
-                    if (lines.length <= 1) {
-                        showToast("No transaction rows found.", "error");
-                        return;
-                    }
-
-                    let importedCount = 0;
-                    let parsedTransactions = [];
-
-                    for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
-                        
-                        if (row.length >= 6) {
-                            parsedTransactions.push({
-                                id: 'import_' + Date.now() + i,
-                                date: new Date(row[0]).toISOString().split('T')[0],
-                                type: row[1],
-                                name: row[2].toUpperCase(),
-                                qty: parseFloat(row[3]),
-                                price: parseFloat(row[4]),
-                                currency: row[5].toUpperCase()
-                            });
-                            importedCount++;
-                        }
-                    }
-
-                    if (parsedTransactions.length > 0) {
-                        state.transactions = [...state.transactions, ...parsedTransactions];
-                        localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
-                        
-                        const activeView = document.querySelector('.view-section.active');
-                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-                        
-                        showToast(`${importedCount} transactions imported!`);
-                    } else {
-                        showToast("No valid rows found to import.", "error");
-                    }
-                } catch (err) { 
-                    showToast("Failed to parse CSV. Check format.", "error"); 
-                }
-                document.getElementById('csv-upload').value = ''; 
-            };
-            reader.readAsText(file);
-        }
-
         // --- CHARTS ---
         function renderCharts(stats) {
             const allocCtx = document.getElementById('allocationChart').getContext('2d');
@@ -930,7 +858,8 @@
                         labels: Object.keys(stats.assetMap),
                         datasets: [{
                             data: Object.values(stats.assetMap),
-                            backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24'],
+                            // Extended palette to 10 colors to prevent charting crashes with many unique classes
+                            backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4', '#14B8A6', '#F97316'],
                             borderWidth: 0,
                             hoverOffset: 4
                         }]
@@ -1028,6 +957,56 @@
             });
         }
 
+        // --- TRANSACTION CRUD ---
+        function handleTransactionSubmit(e) {
+            e.preventDefault();
+            
+            // Highly robust extraction to prevent NaN crashes
+            const txIdInput = document.getElementById('txId').value;
+            const id = txIdInput || Date.now().toString();
+            
+            const rawType = document.getElementById('txType').value;
+            const rawName = document.getElementById('txName').value;
+            const rawDate = document.getElementById('txDate').value;
+            const rawQty = document.getElementById('txQty').value;
+            const rawPrice = document.getElementById('txPrice').value;
+            const rawCurrency = document.getElementById('txCurrency').value;
+
+            const tx = {
+                id: id,
+                type: rawType || 'Crypto',
+                name: (rawName || 'UNNAMED').trim(),
+                date: rawDate || new Date().toISOString().split('T')[0],
+                qty: parseFloat(rawQty) || 0,
+                price: parseFloat(rawPrice) || 0,
+                currency: rawCurrency || 'THB'
+            };
+            
+            const existingIdx = state.transactions.findIndex(t => t.id === id);
+            if(existingIdx >= 0) {
+                state.transactions[existingIdx] = tx;
+            } else {
+                state.transactions.push(tx);
+            }
+            
+            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+            
+            closeModal('addTransactionModal');
+            showToast('Asset transaction saved successfully');
+            
+            const activeView = document.querySelector('.view-section.active');
+            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+        }
+
+        function deleteTx(id) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+            showToast('Transaction deleted', 'error');
+            
+            const activeView = document.querySelector('.view-section.active');
+            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+        }
+
         // --- DATA MANAGEMENT (FILES) ---
         function exportDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
@@ -1074,7 +1053,6 @@
         // --- DATA MANAGEMENT (TEXT SYNC FOR MOBILE) ---
         function copyDataText() {
             try {
-                // Highly robust encoding to support Thai characters and emojis
                 const jsonString = JSON.stringify(state);
                 const encodedString = encodeURIComponent(jsonString);
                 const dataStr = btoa(encodedString);
@@ -1146,6 +1124,7 @@
 
         function openModal(id) {
             const m = document.getElementById(id);
+            if(!m) return;
             m.classList.remove('hidden');
             setTimeout(() => {
                 m.classList.remove('opacity-0');
@@ -1156,20 +1135,15 @@
 
         function closeModal(id) {
             const m = document.getElementById(id);
+            if(!m) return;
             m.classList.add('opacity-0');
             if(id==='addTransactionModal') document.getElementById('addTxBox').classList.add('scale-95');
             if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.add('scale-95');
             setTimeout(() => { 
                 m.classList.add('hidden'); 
-                if(id==='addTransactionModal') {
-                    document.getElementById('txForm').reset();
-                    document.getElementById('txId').value = '';
-                    document.getElementById('modal-title').innerText = 'Add Asset Transaction';
-                }
             }, 300);
         }
 
-        // Safe Toast system to prevent Lucide icon replacement crash
         function showToast(msg, type='success') {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
