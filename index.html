@@ -3,53 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0b0e14">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.2</title>
-    
-    <!-- Dynamic PWA Manifest Injection -->
-    <link rel="manifest" id="dynamic-manifest">
-    
+    <title>Thai Wealth Dashboard - Update 1g (Backup)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Roboto Mono', 'monospace'] },
-                    colors: { bgDark: '#0b0e14', panelDark: '#151924', profit: '#00C805', loss: '#FF3B30', accent: '#2962FF' }
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    colors: {
+                        bgDark: '#0b0e14',
+                        panelDark: '#151924',
+                        profit: '#00C805',
+                        loss: '#FF3B30',
+                        accent: '#2962FF'
+                    }
                 }
             }
         }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0b0e14; color: #f3f4f6; }
+        
+        body { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'Roboto Mono', monospace; }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .glass-panel { background: rgba(21, 25, 36, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .glass-panel {
+            background: rgba(21, 25, 36, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
         .tab-active { border-bottom: 2px solid #2962FF; color: #2962FF; }
         .text-profit { color: #00C805; }
         .text-loss { color: #FF3B30; }
+
         .pulse-update { animation: pulseBg 1s ease-out; }
-        @keyframes pulseBg { 0% { background-color: rgba(41, 98, 255, 0.4); } 100% { background-color: transparent; } }
+        @keyframes pulseBg {
+            0% { background-color: rgba(41, 98, 255, 0.4); }
+            100% { background-color: transparent; }
+        }
+
         .view-section { display: none; }
         .view-section.active { display: block; }
+        
+        /* Hide scrollbar for horizontal tabs and long numbers */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="overflow-hidden flex h-screen text-sm">
+<body class="bg-gray-100 dark:bg-bgDark text-gray-900 dark:text-gray-100 overflow-hidden flex h-screen text-sm">
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 glass-panel border-r border-gray-800 flex flex-col absolute md:relative z-30 h-full transition-transform transform -translate-x-full md:translate-x-0 bg-bgDark">
@@ -61,27 +77,24 @@
             <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()"><i data-lucide="x"></i></button>
         </div>
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <button onclick="nav('dashboard')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="dashboard">
+            <button onclick="nav('dashboard'); toggleSidebarIfMobile()" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="dashboard">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span>
             </button>
-            <button onclick="nav('portfolio')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="portfolio">
+            <button onclick="nav('portfolio'); toggleSidebarIfMobile()" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="portfolio">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i><span>Portfolio & Assets</span>
             </button>
-            <button onclick="nav('transactions')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="transactions">
-                <i data-lucide="list-ordered" class="w-5 h-5"></i><span>Transactions & P/L</span>
+            <button onclick="nav('transactions'); toggleSidebarIfMobile()" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="transactions">
+                <i data-lucide="list-ordered" class="w-5 h-5"></i><span>Transaction & P/L</span>
             </button>
-            <button onclick="nav('rebalance')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="rebalance">
-                <i data-lucide="scale" class="w-5 h-5"></i><span>Target Allocation</span>
-            </button>
-            <button onclick="nav('retirement')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="retirement">
+            <button onclick="nav('retirement'); toggleSidebarIfMobile()" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="retirement">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i><span>Retirement Plan</span>
             </button>
-            <button onclick="nav('settings')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="settings">
+            <button onclick="nav('settings'); toggleSidebarIfMobile()" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition text-left" data-target="settings">
                 <i data-lucide="settings" class="w-5 h-5"></i><span>Settings & Backup</span>
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.2 Live</span>
+            <span id="last-sync" class="opacity-70">Update 1g (Backup)</span>
         </div>
     </aside>
 
@@ -109,6 +122,7 @@
                     <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-gold">--</span>
                 </div>
             </div>
+            
             <div class="flex items-center space-x-2 md:space-x-3 ml-2 shrink-0">
                 <button onclick="fetchMarketData()" class="bg-gray-800 hover:bg-gray-700 text-white px-2 md:px-3 py-1.5 rounded text-xs flex items-center transition shadow border border-gray-700">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5 md:mr-1.5"></i> <span class="hidden md:inline">Refresh</span>
@@ -121,14 +135,6 @@
 
         <!-- View Port -->
         <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-20">
-
-            <!-- ONBOARDING STATE -->
-            <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
-                <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
-                <h2 class="text-3xl font-bold">Welcome to WealthOS 2.2!</h2>
-                <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
-                <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
-            </div>
             
             <!-- VIEW: DASHBOARD -->
             <section id="view-dashboard" class="view-section active space-y-6">
@@ -141,14 +147,14 @@
                         </div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
-                        <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Return (Inc. Divs)</div>
+                        <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Profit / Loss</div>
                         <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-pl">฿0.00</div>
                         <div class="text-sm font-mono font-medium mt-auto" id="dash-total-pl-pct">0.00%</div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Top Performing Asset</div>
                         <div class="text-lg sm:text-xl md:text-2xl font-bold mb-2 text-accent whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-top-asset">None</div>
-                        <div class="text-sm text-gray-400 mt-auto">Based on Total Return</div>
+                        <div class="text-sm text-gray-400 mt-auto">Based on current PnL</div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col">
                         <div class="absolute right-0 top-0 opacity-10"><i data-lucide="pie-chart" class="w-24 h-24"></i></div>
@@ -160,8 +166,8 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-panel p-5 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-semibold mb-4">Historical Net Worth</h3>
-                        <div class="h-72 w-full"><canvas id="historyChart"></canvas></div>
+                        <h3 class="text-lg font-semibold mb-4">Portfolio Growth & PnL</h3>
+                        <div class="h-72 w-full"><canvas id="performanceChart"></canvas></div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800">
                         <h3 class="text-lg font-semibold mb-4">Asset Allocation</h3>
@@ -192,70 +198,40 @@
             <section id="view-transactions" class="view-section space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold">Transactions Log</h2>
-                        <p class="text-sm text-gray-400 mt-1">Click table headers to sort your data.</p>
+                        <h2 class="text-xl font-semibold">Asset Holdings & Market Prices</h2>
+                        <p class="text-sm text-gray-400 mt-1">Stock prices attempt auto-update via Yahoo Finance. If failed, click "Update Price" to enter manually.</p>
+                    </div>
+                    <div class="flex space-x-2 w-full md:w-auto">
+                        <button onclick="exportCSV()" class="flex-1 md:flex-none justify-center glass-panel hover:bg-gray-800 px-3 py-2 rounded text-xs flex items-center transition shadow border border-gray-700">
+                            <i data-lucide="download" class="w-4 h-4 mr-1"></i> Export CSV
+                        </button>
+                        <button onclick="document.getElementById('csv-upload').click()" class="flex-1 md:flex-none justify-center glass-panel hover:bg-gray-800 px-3 py-2 rounded text-xs flex items-center transition shadow border border-gray-700">
+                            <i data-lucide="upload" class="w-4 h-4 mr-1"></i> Import CSV
+                        </button>
+                        <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="importCSV(event)">
                     </div>
                 </div>
                 
                 <div class="glass-panel rounded-xl overflow-hidden overflow-x-auto border border-gray-800">
                     <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase cursor-pointer">
+                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase">
                             <tr>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('date')">Date <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('name')">Asset Name <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('qty')">Qty <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('cost')">Cost (Unit) <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('price')">Current Price <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('value')">Current Value <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('pnl')">Total Return <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4">Date</th>
+                                <th class="p-4">Asset Type / Name</th>
+                                <th class="p-4 text-right">Qty</th>
+                                <th class="p-4 text-right">Avg Cost (Unit)</th>
+                                <th class="p-4 text-right">Market Price (Unit)</th>
+                                <th class="p-4 text-right">Current Value</th>
+                                <th class="p-4 text-right">Profit/Loss</th>
                                 <th class="p-4 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
                     </table>
-                </div>
-            </section>
-
-            <!-- VIEW: TARGET ALLOCATION (REBALANCE) -->
-            <section id="view-rebalance" class="view-section space-y-6">
-                <h2 class="text-2xl font-semibold mb-2">Target Allocation & Rebalancing</h2>
-                <p class="text-gray-400 text-sm mb-6">Set your ideal portfolio percentages. We will calculate exactly what to buy or sell to hit your goal.</p>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Crypto Target (%)</label>
-                        <input type="number" id="tgt-crypto" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
+                    <div id="tx-empty-state" class="text-center py-12 text-gray-500 hidden">
+                        <i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-3 opacity-50"></i>
+                        No transactions found. Add an asset to get started.
                     </div>
-                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Gold Target (%)</label>
-                        <input type="number" id="tgt-gold" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
-                    </div>
-                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Thai Stocks (SET) Target (%)</label>
-                        <input type="number" id="tgt-set" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
-                    </div>
-                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Fixed/Savings Target (%)</label>
-                        <input type="number" id="tgt-fixed" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
-                    </div>
-                </div>
-
-                <div id="rebalance-warning" class="hidden bg-red-900/40 border border-red-500 text-red-200 p-4 rounded-xl mb-6">
-                    <strong>Warning:</strong> Your target percentages do not equal 100%. Please adjust them.
-                </div>
-
-                <div class="glass-panel rounded-xl overflow-hidden overflow-x-auto border border-gray-800">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase">
-                            <tr>
-                                <th class="p-4">Asset Class</th>
-                                <th class="p-4">Current Allocation</th>
-                                <th class="p-4">Target Allocation</th>
-                                <th class="p-4">Action Needed (THB)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rebalance-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
-                    </table>
                 </div>
             </section>
 
@@ -294,25 +270,11 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.2)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1g Backup)</h2>
                 
+                <!-- FILE SYNC OPTIONS -->
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
-                    <p class="text-xs text-gray-400">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
-                            <span class="text-sm font-medium">Copy Data String</span>
-                        </button>
-                        <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
-                            <span class="text-sm font-medium">Paste Data String</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Local JSON Files</h3>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
@@ -325,6 +287,22 @@
                                 <span class="text-sm font-medium">Restore (JSON File)</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- TEXT SYNC OPTIONS -->
+                <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Using Text (Mobile Friendly)</h3>
+                    <p class="text-xs text-gray-400">If file transfers via LINE fail, use Copy & Paste. Click Copy, send the text to yourself in a message, and Paste it on your phone.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
+                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
+                            <span class="text-sm font-medium">Copy Data String</span>
+                        </button>
+                        <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
+                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
+                            <span class="text-sm font-medium">Paste Data String</span>
+                        </button>
                     </div>
                 </div>
 
@@ -385,13 +363,9 @@
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs text-green-400 mb-1">Total Dividends/Interest Received (THB)</label>
-                    <input type="number" id="txDividends" step="any" min="0" value="0" class="w-full bg-gray-800 border border-green-900/50 rounded p-3 text-sm outline-none focus:border-green-500">
-                </div>
                 <div class="pt-4 flex justify-end space-x-3 mt-4">
                     <button type="button" onclick="closeModal('addTransactionModal')" class="px-4 py-3 rounded text-sm hover:bg-gray-800 transition w-full md:w-auto">Cancel</button>
-                    <button type="submit" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded text-sm font-semibold transition w-full md:w-auto">Save Asset</button>
+                    <button type="submit" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded text-sm font-semibold transition w-full md:w-auto">Save</button>
                 </div>
             </form>
         </div>
@@ -431,71 +405,71 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
-        // --- 1. PWA INJECTION ---
-        function initPWA() {
-            const manifest = {
-                name: "WealthOS Dashboard",
-                short_name: "WealthOS",
-                start_url: ".",
-                display: "standalone",
-                background_color: "#0b0e14",
-                theme_color: "#2962FF",
-                icons: [{"src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232962FF'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml"}]
-            };
-            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
-        }
-
-        // --- 2. STATE & SAFE LOCAL STORAGE ---
-        let state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
-        let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
-        let charts = { allocation: null, history: null, retirement: null };
-        let txSort = { col: 'date', asc: false };
-
-        function loadData() {
-            try {
-                const t = localStorage.getItem('wealth_txs'); if(t) state.transactions = JSON.parse(t) || [];
-                const p = localStorage.getItem('wealth_custom_prices'); if(p) state.customPrices = JSON.parse(p) || {};
-                const h = localStorage.getItem('wealth_history'); if(h) state.history = JSON.parse(h) || [];
-                const tg = localStorage.getItem('wealth_targets'); if(tg) state.targets = JSON.parse(tg) || state.targets;
-            } catch(e) { console.warn("Memory issue:", e); }
-        }
-
-        function saveData() {
-            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
-            localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
-            localStorage.setItem('wealth_history', JSON.stringify(state.history));
-            localStorage.setItem('wealth_targets', JSON.stringify(state.targets));
-        }
-
-        async function init() {
-            lucide.createIcons();
-            initPWA();
-            loadData();
-            
-            if(state.transactions.length === 0) {
-                document.getElementById('onboarding-state').classList.remove('hidden');
-                document.getElementById('view-dashboard').classList.add('hidden');
-            } else {
-                document.getElementById('onboarding-state').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
+        // --- SAFE STATE MANAGEMENT ---
+        let state = { transactions: [], customPrices: {} };
+        
+        try {
+            const storedTxs = localStorage.getItem('wealth_txs');
+            if (storedTxs) {
+                const parsed = JSON.parse(storedTxs);
+                state.transactions = Array.isArray(parsed) ? parsed : [];
             }
+        } catch(e) {
+            console.warn("Update 1g Auto-Fix: Corrupted transactions memory detected and cleared.");
+            localStorage.removeItem('wealth_txs');
+        }
 
-            await fetchMarketData(); 
+        try {
+            const storedPrices = localStorage.getItem('wealth_custom_prices');
+            if (storedPrices) {
+                const parsed = JSON.parse(storedPrices);
+                state.customPrices = (typeof parsed === 'object' && parsed !== null) ? parsed : {};
+            }
+        } catch(e) {
+            console.warn("Update 1g Auto-Fix: Corrupted price memory detected and cleared.");
+            localStorage.removeItem('wealth_custom_prices');
+        }
+
+        let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
+        let charts = { allocation: null, performance: null, retirement: null };
+
+        function init() {
+            lucide.createIcons();
+            fetchMarketData(); 
             nav('dashboard'); 
         }
 
-        // --- 3. NAVIGATION & MODALS ---
+        function openAddAssetModal() {
+            try {
+                document.getElementById('txForm').reset();
+                document.getElementById('txId').value = '';
+                document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                const dateInput = document.getElementById('txDate');
+                if(dateInput) dateInput.valueAsDate = new Date();
+                openModal('addTransactionModal');
+            } catch(e) {
+                console.error("Failed to cleanly open modal:", e);
+                openModal('addTransactionModal');
+            }
+        }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
-        function toggleSidebarIfMobile() { if (window.innerWidth < 768) toggleSidebar(); }
+        
+        function toggleSidebarIfMobile() {
+            if (window.innerWidth < 768) { toggleSidebar(); }
+        }
 
         function nav(viewId) {
-            document.getElementById('onboarding-state').classList.add('hidden'); // Clear onboarding
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-gray-800', 'text-white'));
             
@@ -511,234 +485,309 @@
         function renderCurrentView(viewId) {
             try {
                 if(viewId === 'dashboard') renderDashboard();
-                if(viewId === 'portfolio') switchPortTab(document.querySelector('.port-tab-btn.tab-active')?.getAttribute('data-type') || 'All');
+                if(viewId === 'portfolio') {
+                    const activeBtn = document.querySelector('.port-tab-btn.tab-active');
+                    switchPortTab(activeBtn ? activeBtn.getAttribute('data-type') : 'All');
+                }
                 if(viewId === 'transactions') renderTransactions();
-                if(viewId === 'rebalance') renderRebalance();
                 if(viewId === 'retirement') updateRetirement();
-            } catch(e) { console.error("Render Error in View " + viewId + ":", e); }
+            } catch(e) {
+                console.error("View rendering error prevented in 1g:", e);
+            }
         }
 
-        function openAddAssetModal() {
-            document.getElementById('txForm').reset();
-            document.getElementById('txId').value = '';
-            document.getElementById('modal-title').innerText = 'Add Asset Transaction';
-            document.getElementById('txDate').valueAsDate = new Date();
-            openModal('addTransactionModal');
-        }
-
-        // --- 4. MARKET DATA (Multi-Proxy Yahoo Finance) ---
+        // --- REAL-TIME DATA FETCHING ENGINE (Update 1g - MULTI-PROXY YAHOO) ---
         async function fetchMarketData() {
             document.getElementById('last-sync').innerText = "Syncing live data...";
             let offlineMode = false;
             
+            // 1. Fetch USD/THB Exchange Rate
             try {
                 let erRes = await fetch('https://open.er-api.com/v6/latest/USD');
+                if(!erRes.ok) throw new Error("ER-API Not OK");
                 let erData = await erRes.json();
                 market.usd_thb = erData.rates.THB;
                 document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2);
                 flashUI('ui-usd-thb');
             } catch(e) { offlineMode = true; document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2); }
 
+            // 2. Fetch BTC Price 
             try {
-                let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-                let d3 = await r3.json();
-                market.prices['BTC'] = d3.bitcoin.usd * market.usd_thb;
-                document.getElementById('ticker-btc-usd').innerText = `$${formatNum(d3.bitcoin.usd, 0)}`;
-                flashUI('ui-btc-usd');
-            } catch(e) { offlineMode = true; market.prices['BTC'] = 65000 * market.usd_thb; }
-
-            try {
-                let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
-                let d3 = await r3.json();
-                let goldThb = (d3['pax-gold'].usd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
-                market.prices['GOLD'] = Math.round(goldThb / 50) * 50;
-                document.getElementById('ticker-gold').innerText = `฿${formatNum(market.prices['GOLD'], 0)}`;
-                flashUI('ui-gold');
-            } catch(e) { offlineMode = true; market.prices['GOLD'] = 40000; }
-
-            // Thai Stocks via Multi-Proxy Yahoo Finance
-            let setAssets = new Set(state.transactions.filter(t => t.type === 'SET').map(t => (t.name || "").toUpperCase().trim()));
-            for (let baseName of setAssets) {
-                if(!baseName) continue;
-                let queryTicker = baseName.endsWith('.BK') ? baseName : baseName + '.BK';
-                let price = null;
-                
+                let btcUsd = null;
                 try {
-                    let res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
-                    if(res.ok) { let d = await res.json(); price = JSON.parse(d.contents).chart.result[0].meta.regularMarketPrice; }
-                } catch(e) {}
-                
-                if(!price) {
-                    try {
-                        let res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
-                        if(res.ok) { let parsed = await res.json(); price = parsed.chart.result[0].meta.regularMarketPrice; }
-                    } catch(e) {}
+                    let r1 = await fetch('https://api.coinbase.com/v2/prices/BTC-USD/spot');
+                    if (!r1.ok) throw new Error();
+                    let d1 = await r1.json();
+                    btcUsd = parseFloat(d1.data.amount);
+                } catch(e1) {
+                    let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                    if (!r3.ok) throw new Error();
+                    let d3 = await r3.json();
+                    btcUsd = d3.bitcoin.usd;
                 }
+                
+                if (btcUsd === null || isNaN(btcUsd)) throw new Error();
 
-                if(price && !isNaN(price)) market.prices[baseName] = price;
+                market.prices['BTC'] = btcUsd * market.usd_thb;
+                document.getElementById('ticker-btc-usd').innerText = `$${formatNum(btcUsd, 0)}`;
+                flashUI('ui-btc-usd');
+            } catch(e) { 
+                offlineMode = true;
+                let fallbackBtcUsd = 65000;
+                market.prices['BTC'] = fallbackBtcUsd * market.usd_thb;
+                document.getElementById('ticker-btc-usd').innerText = `$${formatNum(fallbackBtcUsd, 0)}`;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.2 (Offline Fallback)` : `Update 2.2 - Last sync: ${new Date().toLocaleTimeString()}`;
+            // 3. Fetch Gold Price
+            try {
+                let spotUsd = null;
+                try {
+                    let r1 = await fetch('https://api.kraken.com/0/public/Ticker?pair=PAXGUSD');
+                    if (!r1.ok) throw new Error();
+                    let d1 = await r1.json();
+                    spotUsd = parseFloat(d1.result.PAXGUSD.c[0]);
+                } catch(e1) {
+                    let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
+                    if (!r3.ok) throw new Error();
+                    let d3 = await r3.json();
+                    spotUsd = d3['pax-gold'].usd;
+                }
+                
+                if (spotUsd === null || isNaN(spotUsd)) throw new Error();
+
+                let goldThb = (spotUsd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
+                let roundedGold = Math.round(goldThb / 50) * 50;
+                market.prices['GOLD'] = roundedGold;
+                document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
+                flashUI('ui-gold');
+            } catch(e) { 
+                offlineMode = true;
+                let fallbackSpotUsd = 2350;
+                let goldThb = (fallbackSpotUsd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
+                let roundedGold = Math.round(goldThb / 50) * 50;
+                market.prices['GOLD'] = roundedGold;
+                document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
+            }
+
+            // 4. MULTI-PROXY YAHOO FINANCE INTEGRATION FOR THAI STOCKS (UPDATE 1g)
+            let setAssets = new Set();
+            state.transactions.forEach(tx => {
+                if(tx.type === 'SET') {
+                    let sym = (tx.name || "").toUpperCase().trim();
+                    if (sym) setAssets.add(sym);
+                }
+            });
+
+            for (let baseName of setAssets) {
+                try {
+                    let queryTicker = baseName.endsWith('.BK') ? baseName : baseName + '.BK';
+                    let price = null;
+                    
+                    // Proxy 1: AllOrigins
+                    try {
+                        let res1 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
+                        if(res1.ok) {
+                            let data1 = await res1.json();
+                            let parsed1 = JSON.parse(data1.contents);
+                            price = parsed1.chart.result[0].meta.regularMarketPrice;
+                        }
+                    } catch(e1) {}
+
+                    // Proxy 2: CodeTabs (Fallback)
+                    if (!price) {
+                        try {
+                            let res2 = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
+                            if(res2.ok) {
+                                let parsed2 = await res2.json();
+                                price = parsed2.chart.result[0].meta.regularMarketPrice;
+                            }
+                        } catch(e2) {}
+                    }
+
+                    // Save if we successfully extracted a number
+                    if(price && !isNaN(price)) {
+                        market.prices[baseName] = price;
+                        console.log(`Successfully fetched ${queryTicker}: ฿${price}`);
+                    }
+                } catch(e) {
+                    console.log(`Auto-fetch failed for ${baseName}`);
+                }
+            }
+
+            if(offlineMode) {
+                document.getElementById('last-sync').innerText = `Update 1g Backup (Offline Fallback)`;
+                showToast('Network limits reached. Using localized fallback prices.', 'error');
+            } else {
+                document.getElementById('last-sync').innerText = `Update 1g Backup - Last sync: ${new Date().toLocaleTimeString()}`;
+            }
             
-            // Take daily historical snapshot
-            const stats = calculatePortfolio();
-            takeSnapshot(stats);
-            
-            if(document.querySelector('.view-section.active')) renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
+            const activeViewEl = document.querySelector('.view-section.active');
+            if(activeViewEl) {
+                renderCurrentView(activeViewEl.id.replace('view-', ''));
+            }
         }
 
-        function takeSnapshot(stats) {
-            if (!stats || stats.totalValue <= 0) return;
-            let today = new Date().toISOString().split('T')[0];
-            let lastSnap = state.history.length > 0 ? state.history[state.history.length - 1] : null;
-            
-            if (!lastSnap || lastSnap.date !== today) state.history.push({ date: today, value: stats.totalValue });
-            else state.history[state.history.length - 1].value = stats.totalValue;
-            
-            saveData();
-        }
-
-        // --- 5. VALUATION ENGINE ---
+        // --- VALUATION ENGINE ---
         function getAssetMarketPrice(tx) {
             let n = (tx.name || "UNKNOWN").toUpperCase();
-            if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN') && market.prices['BTC'] > 0) return market.prices['BTC'];
-            if (tx.type === 'Gold' && market.prices['GOLD'] > 0) return market.prices['GOLD'];
-            if (tx.type === 'SET' && market.prices[n] > 0) return market.prices[n];
-            if (tx.type === 'SET' && market.prices[n + '.BK'] > 0) return market.prices[n + '.BK'];
-            if (state.customPrices[n]) return state.customPrices[n];
+            
+            if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN')) {
+                return market.prices['BTC'] > 0 ? market.prices['BTC'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
+            }
+            if (tx.type === 'Gold') {
+                return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
+            }
+            
+            // Check Yahoo Proxy prices
+            if (tx.type === 'SET') {
+                if (market.prices[n] > 0) return market.prices[n];
+                if (market.prices[n + '.BK'] > 0) return market.prices[n + '.BK'];
+            }
+            
+            if (state.customPrices[n]) {
+                return state.customPrices[n];
+            }
+            
             return (parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1);
         }
 
         function calculatePortfolio() {
-            let totalCost = 0, totalValue = 0, totalDividends = 0;
-            let assetMap = {}, grouped = {};
+            let totalCost = 0;
+            let totalValue = 0;
+            let assetMap = {};
 
             state.transactions.forEach(tx => {
                 let costThb = (parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1);
-                let currentValThb = getAssetMarketPrice(tx) * (parseFloat(tx.qty) || 0);
-                let div = parseFloat(tx.dividends) || 0;
+                let currentUnitThb = getAssetMarketPrice(tx);
+                let currentValThb = currentUnitThb * (parseFloat(tx.qty) || 0);
 
                 totalCost += costThb;
                 totalValue += currentValThb;
-                totalDividends += div;
 
                 if (!assetMap[tx.type]) assetMap[tx.type] = 0;
                 assetMap[tx.type] += currentValThb;
-
-                let name = (tx.name || "UNKNOWN").toUpperCase();
-                if(!grouped[name]) grouped[name] = { cost: 0, val: 0, div: 0 };
-                grouped[name].cost += costThb;
-                grouped[name].val += currentValThb;
-                grouped[name].div += div;
             });
 
-            let topAsset = "None", topAssetProfit = -Infinity;
+            let topAsset = "None";
+            let topAssetProfit = -Infinity;
+            let grouped = {};
+            
+            state.transactions.forEach(tx => {
+                let name = (tx.name || "UNKNOWN").toUpperCase();
+                if(!grouped[name]) grouped[name] = { cost: 0, val: 0 };
+                grouped[name].cost += ((parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1));
+                grouped[name].val += (getAssetMarketPrice(tx) * (parseFloat(tx.qty) || 0));
+            });
+
             for(let key in grouped) {
-                let totalReturn = grouped[key].val - grouped[key].cost + grouped[key].div;
-                if(totalReturn > topAssetProfit && totalReturn > 0) { topAssetProfit = totalReturn; topAsset = key; }
+                let pnl = grouped[key].val - grouped[key].cost;
+                if(pnl > topAssetProfit && pnl > 0) {
+                    topAssetProfit = pnl;
+                    topAsset = key;
+                }
             }
 
-            return { totalCost, totalValue, totalDividends, assetMap, topAsset };
+            return { totalCost, totalValue, assetMap, topAsset };
         }
 
-        // --- 6. RENDERING LOGIC ---
+        // --- RENDERING VIEWS ---
         function renderDashboard() {
-            if(state.transactions.length === 0) return;
-            document.getElementById('onboarding-state').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
-
             const stats = calculatePortfolio();
-            const totalReturn = stats.totalValue - stats.totalCost + stats.totalDividends;
-            const returnPct = stats.totalCost > 0 ? (totalReturn / stats.totalCost) * 100 : 0;
+            const pnl = stats.totalValue - stats.totalCost;
+            const pnlPct = stats.totalCost > 0 ? (pnl / stats.totalCost) * 100 : 0;
 
-            document.getElementById('dash-total-value').innerText = `฿${formatNum(stats.totalValue, 2)}`;
+            const totalValStr = `฿${formatNum(stats.totalValue, 2)}`;
+            const totalValEl = document.getElementById('dash-total-value');
+            totalValEl.innerText = totalValStr;
+            totalValEl.title = totalValStr;
+            
             document.getElementById('dash-total-cost').innerText = `฿${formatNum(stats.totalCost, 2)}`;
             
             const plEl = document.getElementById('dash-total-pl');
-            plEl.innerText = `${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}`;
-            plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
-            
             const plPctEl = document.getElementById('dash-total-pl-pct');
-            plPctEl.innerText = `${totalReturn >= 0 ? '+' : ''}${returnPct.toFixed(2)}%`;
-            plPctEl.className = `text-sm font-mono font-medium mt-auto ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
+            const pnlStr = `${pnl >= 0 ? '+' : ''}฿${formatNum(pnl, 2)}`;
+            plEl.innerText = pnlStr;
+            plEl.title = pnlStr;
+            plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${pnl >= 0 ? 'text-profit' : 'text-loss'}`;
+            plPctEl.innerText = `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`;
+            plPctEl.className = `text-sm font-mono font-medium ${pnl >= 0 ? 'text-profit' : 'text-loss'}`;
 
             document.getElementById('dash-top-asset').innerText = stats.topAsset;
-            document.getElementById('dash-asset-count').innerText = new Set(state.transactions.map(t => (t.name || "").toUpperCase())).size;
+            
+            let uniqueAssets = new Set(state.transactions.map(t => (t.name || "UNKNOWN").toUpperCase()));
+            document.getElementById('dash-asset-count').innerText = uniqueAssets.size;
             
             renderCharts(stats);
         }
 
-        function renderCharts(stats) {
-            const allocCtx = document.getElementById('allocationChart').getContext('2d');
-            if(charts.allocation) charts.allocation.destroy();
-            if(Object.keys(stats.assetMap).length > 0) {
-                charts.allocation = new Chart(allocCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(stats.assetMap),
-                        datasets: [{ data: Object.values(stats.assetMap), backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4'], borderWidth: 0, hoverOffset: 4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } } }
-                });
-            }
-
-            const histCtx = document.getElementById('historyChart').getContext('2d');
-            if(charts.history) charts.history.destroy();
-            let labels = state.history.map(h => new Date(h.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}));
-            let data = state.history.map(h => h.value);
-            if(labels.length === 1) { labels.unshift('Start'); data.unshift(0); }
-
-            if (data.length > 0) {
-                charts.history = new Chart(histCtx, {
-                    type: 'line',
-                    data: { labels: labels, datasets: [{ label: 'Net Worth (THB)', data: data, borderColor: '#00C805', backgroundColor: 'rgba(0, 200, 5, 0.1)', fill: true, tension: 0.3, pointRadius: 3 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } }, plugins: { legend: { display: false } } }
-                });
-            }
-        }
-
         function switchPortTab(filterType, btnObj = null) {
-            document.querySelectorAll('.port-tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-gray-400'); });
+            document.querySelectorAll('.port-tab-btn').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-gray-400');
+            });
+            
             let activeBtn = btnObj || document.querySelector(`.port-tab-btn[data-type="${filterType}"]`);
-            if(activeBtn) { activeBtn.classList.add('tab-active'); activeBtn.classList.remove('text-gray-400'); }
+            if(activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('text-gray-400');
+            }
 
             const container = document.getElementById('port-tab-content');
             container.innerHTML = '';
             
             let filteredTxs = filterType === 'All' ? state.transactions : state.transactions.filter(t => t.type === filterType || (filterType==='Overview' && t.type));
-            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${filterType}.</div>`; return; }
+            
+            if(filteredTxs.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${filterType}.</div>`;
+                return;
+            }
 
             let grouped = {};
             filteredTxs.forEach(tx => {
                 let name = (tx.name || "UNKNOWN").toUpperCase();
                 let costThb = (parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1);
-                let currentValThb = getAssetMarketPrice(tx) * (parseFloat(tx.qty) || 0);
+                let marketUnitThb = getAssetMarketPrice(tx);
+                let currentValThb = marketUnitThb * (parseFloat(tx.qty) || 0);
 
-                if(!grouped[name]) grouped[name] = { name: name, type: tx.type, qty: 0, cost: 0, value: 0, div: 0 };
+                if(!grouped[name]) {
+                    grouped[name] = { name: name, type: tx.type, qty: 0, cost: 0, value: 0 };
+                }
                 grouped[name].qty += (parseFloat(tx.qty) || 0);
                 grouped[name].cost += costThb;
                 grouped[name].value += currentValThb;
-                grouped[name].div += (parseFloat(tx.dividends) || 0);
             });
 
             Object.values(grouped).forEach(asset => {
-                let totalReturn = asset.value - asset.cost + asset.div;
-                let returnPct = asset.cost > 0 ? (totalReturn / asset.cost) * 100 : 0;
-                let isProfit = totalReturn >= 0;
+                let pnl = asset.value - asset.cost;
+                let pnlPct = asset.cost > 0 ? (pnl / asset.cost) * 100 : 0;
+                let isProfit = pnl >= 0;
 
                 let card = `
                     <div class="glass-panel p-5 rounded-xl border border-gray-800">
                         <div class="flex justify-between items-start mb-4">
-                            <div><h4 class="font-bold text-lg text-gray-200">${asset.name}</h4><span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span></div>
-                            <div class="text-right"><div class="text-xs text-gray-500">Total Units</div><div class="font-mono font-semibold">${formatNum(asset.qty, 4)}</div></div>
+                            <div>
+                                <h4 class="font-bold text-lg text-gray-200">${asset.name}</h4>
+                                <span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-500">Total Units</div>
+                                <div class="font-mono font-semibold">${formatNum(asset.qty, 4)}</div>
+                            </div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-sm"><span class="text-gray-400">Total Cost:</span><span class="font-mono">฿${formatNum(asset.cost, 2)}</span></div>
-                            <div class="flex justify-between text-sm"><span class="text-gray-400">Market Value:</span><span class="font-mono font-bold text-gray-200">฿${formatNum(asset.value, 2)}</span></div>
-                            ${asset.div > 0 ? `<div class="flex justify-between text-sm text-green-400"><span class="opacity-80">Dividends:</span><span class="font-mono">+฿${formatNum(asset.div, 2)}</span></div>` : ''}
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Total Cost Basis:</span>
+                                <span class="font-mono">฿${formatNum(asset.cost, 2)}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Market Value:</span>
+                                <span class="font-mono font-bold text-gray-200">฿${formatNum(asset.value, 2)}</span>
+                            </div>
                             <div class="flex justify-between text-sm pt-3 mt-3 border-t border-gray-800">
-                                <span class="text-gray-400">Total Return:</span>
-                                <span class="font-mono font-bold ${isProfit ? 'text-profit' : 'text-loss'}">${isProfit ? '+' : ''}฿${formatNum(totalReturn, 2)} <span class="text-[10px] opacity-80">(${returnPct.toFixed(2)}%)</span></span>
+                                <span class="text-gray-400">Unrealized PnL:</span>
+                                <span class="font-mono font-bold ${isProfit ? 'text-profit' : 'text-loss'}">
+                                    ${isProfit ? '+' : ''}฿${formatNum(pnl, 2)} <span class="text-[10px] opacity-80">(${pnlPct.toFixed(2)}%)</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -747,61 +796,52 @@
             });
         }
 
-        function sortTx(col) {
-            if(txSort.col === col) txSort.asc = !txSort.asc;
-            else { txSort.col = col; txSort.asc = false; }
-            renderTransactions();
-        }
-
         function renderTransactions() {
             const tbody = document.getElementById('transactions-table');
             const empty = document.getElementById('tx-empty-state');
             tbody.innerHTML = '';
-            if (state.transactions.length === 0) { empty.classList.remove('hidden'); return; }
+            
+            if (state.transactions.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
             empty.classList.add('hidden');
 
-            let sorted = [...state.transactions].sort((a,b) => {
-                let vA, vB;
-                let costA = (parseFloat(a.qty)||0) * (parseFloat(a.price)||0) * (a.currency==='USD'?market.usd_thb:1);
-                let costB = (parseFloat(b.qty)||0) * (parseFloat(b.price)||0) * (b.currency==='USD'?market.usd_thb:1);
-                
-                if(txSort.col === 'date') { vA = new Date(a.date).getTime(); vB = new Date(b.date).getTime(); }
-                if(txSort.col === 'name') { vA = (a.name||"").toUpperCase(); vB = (b.name||"").toUpperCase(); }
-                if(txSort.col === 'qty') { vA = parseFloat(a.qty)||0; vB = parseFloat(b.qty)||0; }
-                if(txSort.col === 'cost') { vA = costA / (parseFloat(a.qty)||1); vB = costB / (parseFloat(b.qty)||1); }
-                if(txSort.col === 'price') { vA = getAssetMarketPrice(a); vB = getAssetMarketPrice(b); }
-                if(txSort.col === 'value') { vA = getAssetMarketPrice(a) * (parseFloat(a.qty)||0); vB = getAssetMarketPrice(b) * (parseFloat(b.qty)||0); }
-                if(txSort.col === 'pnl') { vA = (getAssetMarketPrice(a)*(parseFloat(a.qty)||0)) - costA + (parseFloat(a.dividends)||0); vB = (getAssetMarketPrice(b)*(parseFloat(b.qty)||0)) - costB + (parseFloat(b.dividends)||0); }
-
-                if (vA < vB) return txSort.asc ? -1 : 1;
-                if (vA > vB) return txSort.asc ? 1 : -1;
-                return 0;
-            });
+            let sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
 
             sorted.forEach(tx => {
                 let costThb = (parseFloat(tx.price) || 0) * (parseFloat(tx.qty) || 0) * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let marketUnitThb = getAssetMarketPrice(tx);
                 let currentValThb = marketUnitThb * (parseFloat(tx.qty) || 0);
-                let totalReturn = currentValThb - costThb + (parseFloat(tx.dividends)||0);
-                let returnPct = costThb > 0 ? (totalReturn / costThb) * 100 : 0;
+                let pnl = currentValThb - costThb;
+                let pnlPct = costThb > 0 ? (pnl / costThb) * 100 : 0;
                 
                 let txNameUpper = (tx.name||"").toUpperCase();
-                let isAutoAsset = (tx.type === 'Crypto' && (txNameUpper === 'BTC')) || tx.type === 'Gold' || (tx.type === 'SET' && (market.prices[txNameUpper] > 0 || market.prices[txNameUpper + '.BK'] > 0));
+                let isAutoAsset = (tx.type === 'Crypto' && (txNameUpper === 'BTC')) || 
+                                  tx.type === 'Gold' || 
+                                  (tx.type === 'SET' && (market.prices[txNameUpper] > 0 || market.prices[txNameUpper + '.BK'] > 0));
 
                 let row = `
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
                         <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
-                        <td class="p-4"><div class="font-bold text-gray-200">${txNameUpper}</div><div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div></td>
+                        <td class="p-4">
+                            <div class="font-bold text-gray-200">${txNameUpper}</div>
+                            <div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div>
+                        </td>
                         <td class="p-4 text-right">${formatNum(parseFloat(tx.qty)||0, 4)}</td>
                         <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (parseFloat(tx.qty) || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
-                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px]">Live</span>`}
+                            ${!isAutoAsset ? `
+                                <button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent" title="Manual Update">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3 inline"></i>
+                                </button>
+                            ` : `<span class="ml-2 text-accent text-[10px]" title="Auto-updated API">Live</span>`}
                         </td>
                         <td class="p-4 text-right font-bold text-gray-200">฿${formatNum(currentValThb, 2)}</td>
-                        <td class="p-4 text-right font-bold ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}">
-                            ${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}<br>
-                            <span class="text-[10px] opacity-80">${returnPct.toFixed(2)}%</span>
+                        <td class="p-4 text-right font-bold ${pnl >= 0 ? 'text-profit' : 'text-loss'}">
+                            ${pnl >= 0 ? '+' : ''}฿${formatNum(pnl, 2)}<br>
+                            <span class="text-[10px] opacity-80">${pnlPct.toFixed(2)}%</span>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
                             <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline"></i></button>
@@ -814,191 +854,461 @@
             lucide.createIcons();
         }
 
-        // --- REBALANCE ---
-        function renderRebalance() {
-            document.getElementById('tgt-crypto').value = state.targets['Crypto'] || 0;
-            document.getElementById('tgt-gold').value = state.targets['Gold'] || 0;
-            document.getElementById('tgt-set').value = state.targets['SET'] || 0;
-            document.getElementById('tgt-fixed').value = state.targets['Fixed'] || 0;
-            calculateRebalance();
-        }
-
-        function calculateRebalance() {
-            const stats = calculatePortfolio();
-            const tbody = document.getElementById('rebalance-table');
-            tbody.innerHTML = '';
-            
-            let sum = 0;
-            ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
-                let val = parseFloat(document.getElementById(`tgt-${k.toLowerCase()}`).value) || 0;
-                state.targets[k] = val;
-                sum += val;
-            });
-
-            if(Math.round(sum) !== 100) document.getElementById('rebalance-warning').classList.remove('hidden');
-            else document.getElementById('rebalance-warning').classList.add('hidden');
-
-            ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
-                let currentVal = stats.assetMap[k] || 0;
-                let currentPct = stats.totalValue > 0 ? (currentVal / stats.totalValue) * 100 : 0;
-                let targetPct = state.targets[k];
-                let targetVal = stats.totalValue * (targetPct / 100);
-                let diff = targetVal - currentVal;
-                
-                let action = diff > 100 ? "BUY" : (diff < -100 ? "SELL" : "HOLD");
-                let actionColor = diff > 100 ? "text-profit" : (diff < -100 ? "text-loss" : "text-gray-400");
-                
-                let row = `
-                    <tr class="border-b border-gray-800 hover:bg-gray-800/50">
-                        <td class="p-4 font-bold text-gray-200">${k}</td>
-                        <td class="p-4">${currentPct.toFixed(1)}% <span class="text-gray-500 text-xs">(฿${formatNum(currentVal, 0)})</span></td>
-                        <td class="p-4 text-accent font-bold">${targetPct}% <span class="text-gray-500 text-xs font-normal">(฿${formatNum(targetVal, 0)})</span></td>
-                        <td class="p-4 font-bold ${actionColor}">${action} ฿${formatNum(Math.abs(diff), 0)}</td>
-                    </tr>
-                `;
-                tbody.insertAdjacentHTML('beforeend', row);
-            });
-            saveData();
-        }
-
-        // --- ACTIONS ---
-        function handleTransactionSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('txId').value || Date.now().toString();
-            const tx = {
-                id: id, type: document.getElementById('txType').value || 'Crypto',
-                name: (document.getElementById('txName').value || 'UNNAMED').trim(),
-                date: document.getElementById('txDate').value || new Date().toISOString().split('T')[0],
-                qty: parseFloat(document.getElementById('txQty').value) || 0,
-                price: parseFloat(document.getElementById('txPrice').value) || 0,
-                currency: document.getElementById('txCurrency').value || 'THB',
-                dividends: parseFloat(document.getElementById('txDividends').value) || 0
-            };
-            
-            const existingIdx = state.transactions.findIndex(t => t.id === id);
-            if(existingIdx >= 0) state.transactions[existingIdx] = tx; else state.transactions.push(tx);
-            
-            saveData();
-            closeModal('addTransactionModal');
-            showToast('Asset transaction saved successfully');
-            renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-        }
-
-        function deleteTx(id) {
-            state.transactions = state.transactions.filter(t => t.id !== id);
-            saveData(); showToast('Transaction deleted', 'error');
-            renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-        }
-
+        // --- EDIT TRANSACTION LOGIC ---
         function editTx(id) {
-            const tx = state.transactions.find(t => t.id === id); if (!tx) return;
-            document.getElementById('txId').value = tx.id || ''; document.getElementById('txType').value = tx.type || 'Crypto';
-            document.getElementById('txName').value = tx.name || ''; document.getElementById('txDate').value = tx.date || '';
-            document.getElementById('txQty').value = tx.qty || 0; document.getElementById('txPrice').value = tx.price || 0;
-            document.getElementById('txCurrency').value = tx.currency || 'THB'; document.getElementById('txDividends').value = tx.dividends || 0;
+            const tx = state.transactions.find(t => t.id === id);
+            if (!tx) return;
+            
+            document.getElementById('txId').value = tx.id || '';
+            document.getElementById('txType').value = tx.type || 'Crypto';
+            document.getElementById('txName').value = tx.name || '';
+            document.getElementById('txDate').value = tx.date || '';
+            document.getElementById('txQty').value = tx.qty || 0;
+            document.getElementById('txPrice').value = tx.price || 0;
+            document.getElementById('txCurrency').value = tx.currency || 'THB';
+            
             document.getElementById('modal-title').innerText = "Edit Asset Transaction";
             openModal('addTransactionModal');
         }
 
+        // --- UPDATE CUSTOM PRICE LOGIC ---
         function openUpdatePrice(assetName) {
             if(!assetName) return;
             document.getElementById('upd-asset-name').innerText = assetName.toUpperCase();
-            document.getElementById('upd-google-link').href = `https://www.google.com/search?q=${encodeURIComponent(`${assetName} stock price thb`)}`;
-            document.getElementById('upd-new-price').value = state.customPrices[assetName.toUpperCase()] || '';
+            
+            const searchQuery = encodeURIComponent(`${assetName} stock price thb`);
+            document.getElementById('upd-google-link').href = `https://www.google.com/search?q=${searchQuery}`;
+            
+            let existing = state.customPrices[assetName.toUpperCase()];
+            document.getElementById('upd-new-price').value = existing ? existing : '';
             document.getElementById('upd-asset-id').value = assetName.toUpperCase();
+            
             openModal('updatePriceModal');
         }
 
         function saveUpdatedPrice() {
-            let assetKey = document.getElementById('upd-asset-id').value, newPrice = parseFloat(document.getElementById('upd-new-price').value);
+            let assetKey = document.getElementById('upd-asset-id').value;
+            let newPrice = parseFloat(document.getElementById('upd-new-price').value);
+            
             if(!isNaN(newPrice) && newPrice >= 0) {
-                state.customPrices[assetKey] = newPrice; saveData();
-                showToast(`Price updated for ${assetKey}`); closeModal('updatePriceModal');
-                renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-            } else showToast('Invalid price entered', 'error');
+                state.customPrices[assetKey] = newPrice;
+                localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                showToast(`Price updated for ${assetKey}`);
+                closeModal('updatePriceModal');
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            } else {
+                showToast('Invalid price entered', 'error');
+            }
         }
 
-        // --- DATA SYNC (Using safe Native Prompts for Mobile) ---
+        // --- CSV EXPORT AND IMPORT ---
+        function exportCSV() {
+            if(state.transactions.length === 0) {
+                showToast("No transactions to export", "error");
+                return;
+            }
+            
+            let csv = "Date,Type,Name,Qty,Price,Currency\n";
+            state.transactions.forEach(t => {
+                csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'wealth_transactions.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast("CSV Exported Successfully");
+        }
+
+        function importCSV(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    let rawText = evt.target.result;
+                    
+                    if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
+                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead to sync your devices securely.");
+                        document.getElementById('csv-upload').value = ''; 
+                        return;
+                    }
+
+                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    
+                    if (lines.length <= 1) {
+                        showToast("No transaction rows found.", "error");
+                        return;
+                    }
+
+                    let importedCount = 0;
+                    let parsedTransactions = [];
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
+                        
+                        if (row.length >= 6) {
+                            parsedTransactions.push({
+                                id: 'import_' + Date.now() + i,
+                                date: new Date(row[0]).toISOString().split('T')[0],
+                                type: row[1],
+                                name: row[2].toUpperCase(),
+                                qty: parseFloat(row[3]),
+                                price: parseFloat(row[4]),
+                                currency: row[5].toUpperCase()
+                            });
+                            importedCount++;
+                        }
+                    }
+
+                    if (parsedTransactions.length > 0) {
+                        state.transactions = [...state.transactions, ...parsedTransactions];
+                        localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                        
+                        const activeView = document.querySelector('.view-section.active');
+                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+                        
+                        showToast(`${importedCount} transactions imported!`);
+                    } else {
+                        showToast("No valid rows found to import.", "error");
+                    }
+                } catch (err) { 
+                    showToast("Failed to parse CSV. Check format.", "error"); 
+                }
+                document.getElementById('csv-upload').value = ''; 
+            };
+            reader.readAsText(file);
+        }
+
+        // --- CHARTS ---
+        function renderCharts(stats) {
+            const allocCtx = document.getElementById('allocationChart').getContext('2d');
+            if(charts.allocation) charts.allocation.destroy();
+            
+            if(Object.keys(stats.assetMap).length > 0) {
+                charts.allocation = new Chart(allocCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(stats.assetMap),
+                        datasets: [{
+                            data: Object.values(stats.assetMap),
+                            backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4', '#14B8A6', '#F97316'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } } }
+                });
+            }
+
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            if(charts.performance) charts.performance.destroy();
+            
+            if (state.transactions.length > 0 || stats.totalCost > 0 || stats.totalValue > 0) {
+                charts.performance = new Chart(perfCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Invested (Cost)', 'Current Market Value'],
+                        datasets: [{
+                            label: 'Portfolio (THB)',
+                            data: [stats.totalCost, stats.totalValue],
+                            backgroundColor: ['#334155', stats.totalValue >= stats.totalCost ? '#00C805' : '#FF3B30'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        scales: { 
+                            y: { 
+                                display: true, 
+                                beginAtZero: true, 
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#9ca3af' }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#9ca3af' }
+                            }
+                        }, 
+                        plugins: { legend: { display: false } } 
+                    }
+                });
+            }
+        }
+
+        // --- RETIREMENT CALCULATOR ---
+        function updateRetirement() {
+            const stats = calculatePortfolio();
+            document.getElementById('ret-current-wealth').innerText = `฿${formatNum(stats.totalValue, 2)}`;
+            
+            const principal = stats.totalValue;
+            const monthlyDraw = parseFloat(document.getElementById('ret-monthly-usage').value) || 0;
+            const annualReturn = (parseFloat(document.getElementById('ret-return').value) || 0) / 100;
+            
+            if (principal <= 0 || monthlyDraw <= 0) {
+                document.getElementById('ret-longevity').innerText = "0 Yrs, 0 Mos";
+                return;
+            }
+
+            let balance = principal;
+            let months = 0;
+            let history = [balance];
+            
+            while (balance > 0 && months < 1200) { 
+                balance = balance * (1 + (annualReturn / 12)) - monthlyDraw;
+                if (months % 12 === 0) history.push(Math.max(balance, 0));
+                months++;
+            }
+
+            if (months >= 1200) {
+                document.getElementById('ret-longevity').innerText = "Forever! 🚀";
+                document.getElementById('ret-longevity').className = "text-4xl md:text-5xl font-bold font-mono mb-2 text-profit";
+            } else {
+                let y = Math.floor(months / 12);
+                let m = months % 12;
+                document.getElementById('ret-longevity').innerText = `${y} Yrs, ${m} Mos`;
+                document.getElementById('ret-longevity').className = `text-4xl md:text-5xl font-bold font-mono mb-2 ${y > 15 ? 'text-profit' : 'text-loss'}`;
+            }
+
+            const retCtx = document.getElementById('retirementChart').getContext('2d');
+            if(charts.retirement) charts.retirement.destroy();
+            charts.retirement = new Chart(retCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: history.length}, (_, i) => `Yr ${i}`),
+                    datasets: [{
+                        label: 'Projected Wealth Balance',
+                        data: history,
+                        borderColor: '#2962FF',
+                        backgroundColor: 'rgba(41, 98, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { ticks: {color: '#6b7280'} }, y: { display: false } } }
+            });
+        }
+
+        // --- TRANSACTION CRUD ---
+        function handleTransactionSubmit(e) {
+            e.preventDefault();
+            
+            const txIdInput = document.getElementById('txId').value;
+            const id = txIdInput || Date.now().toString();
+            
+            const rawType = document.getElementById('txType').value;
+            const rawName = document.getElementById('txName').value;
+            const rawDate = document.getElementById('txDate').value;
+            const rawQty = document.getElementById('txQty').value;
+            const rawPrice = document.getElementById('txPrice').value;
+            const rawCurrency = document.getElementById('txCurrency').value;
+
+            const tx = {
+                id: id,
+                type: rawType || 'Crypto',
+                name: (rawName || 'UNNAMED').trim(),
+                date: rawDate || new Date().toISOString().split('T')[0],
+                qty: parseFloat(rawQty) || 0,
+                price: parseFloat(rawPrice) || 0,
+                currency: rawCurrency || 'THB'
+            };
+            
+            const existingIdx = state.transactions.findIndex(t => t.id === id);
+            if(existingIdx >= 0) {
+                state.transactions[existingIdx] = tx;
+            } else {
+                state.transactions.push(tx);
+            }
+            
+            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+            
+            closeModal('addTransactionModal');
+            showToast('Asset transaction saved successfully');
+            
+            const activeView = document.querySelector('.view-section.active');
+            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+        }
+
+        function deleteTx(id) {
+            state.transactions = state.transactions.filter(t => t.id !== id);
+            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+            showToast('Transaction deleted', 'error');
+            
+            const activeView = document.querySelector('.view-section.active');
+            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+        }
+
+        // --- DATA MANAGEMENT (FILES) ---
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "wealth_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importDataJSON(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    let rawData = evt.target.result.trim();
+                    
+                    if(rawData.includes("MSMAMARPCRYPT") || rawData.includes("AES/CBC")) {
+                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead.");
+                        document.getElementById('json-upload-backup').value = '';
+                        return;
+                    }
+
+                    if (rawData.charCodeAt(0) === 0xFEFF) rawData = rawData.slice(1);
+                    
+                    const obj = JSON.parse(rawData);
+                    
+                    if(obj.transactions) state.transactions = obj.transactions;
+                    if(obj.customPrices) state.customPrices = obj.customPrices;
+                    
+                    localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                    localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                    showToast('Backup restored successfully');
+                    
+                    const activeView = document.querySelector('.view-section.active');
+                    if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+                } catch(err) {
+                    showToast('Invalid backup file', 'error');
+                }
+            };
+            reader.readAsText(file);
+            document.getElementById('json-upload-backup').value = '';
+        }
+
+        // --- DATA MANAGEMENT (TEXT SYNC FOR MOBILE) ---
         function copyDataText() {
             try {
-                const dataStr = btoa(encodeURIComponent(JSON.stringify(state)));
-                const textArea = document.createElement("textarea"); textArea.value = dataStr;
-                document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
-                showToast("Data Copied! Paste this text into your other device.");
-            } catch (err) { showToast("Failed to copy data string.", "error"); }
+                const jsonString = JSON.stringify(state);
+                const encodedString = encodeURIComponent(jsonString);
+                const dataStr = btoa(encodedString);
+                
+                const textArea = document.createElement("textarea");
+                textArea.value = dataStr;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                showToast("Data Copied! Paste this text into LINE to send to your phone.");
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to copy data string.", "error");
+            }
         }
 
         function pasteDataText() {
-            const input = prompt("Paste your Data String here to securely sync your devices:");
+            const input = prompt("Paste your Data String here:");
             if (!input) return;
+            
             try {
-                const obj = JSON.parse(decodeURIComponent(atob(input.trim())));
+                const decodedString = atob(input.trim());
+                const jsonStr = decodeURIComponent(decodedString);
+                const obj = JSON.parse(jsonStr);
+                
                 if(obj.transactions) state.transactions = obj.transactions;
                 if(obj.customPrices) state.customPrices = obj.customPrices;
-                if(obj.history) state.history = obj.history;
-                if(obj.targets) state.targets = obj.targets;
-                saveData(); showToast('Data Synced Successfully!');
-                renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
+                
+                localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                showToast('Data Synced Successfully!');
+                
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             } catch(err) {
+                console.error(err);
                 alert("Paste Error: The text you pasted is invalid. Make sure you copied the entire string.");
+                showToast("Failed to sync data.", "error");
             }
         }
 
         function clearAllData() {
             if(confirm("Are you sure you want to delete ALL local data? This cannot be undone.")) {
-                localStorage.removeItem('wealth_txs'); localStorage.removeItem('wealth_custom_prices');
-                localStorage.removeItem('wealth_history'); localStorage.removeItem('wealth_targets');
-                state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
-                showToast('All local data wiped permanently.', 'success');
-                renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
+                localStorage.removeItem('wealth_txs');
+                localStorage.removeItem('wealth_custom_prices');
+                state.transactions = [];
+                state.customPrices = {};
+                showToast('All local data wiped', 'success');
+                
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             }
         }
 
-        // CSV Utils
-        function exportCSV() {
-            if(state.transactions.length === 0) return showToast("No transactions to export", "error");
-            let csv = "Date,Type,Name,Qty,Price,Currency,Dividends\n";
-            state.transactions.forEach(t => csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency},${t.dividends||0}\n`);
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); a.download = 'wealth_transactions.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("CSV Exported");
+        // --- UTILS & TOASTS ---
+        function formatNum(num, decimals = 2) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num);
         }
-        function importCSV(e) {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawText = evt.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                    if (lines.length <= 1) return showToast("No rows found.", "error");
-                    let count = 0, parsedTxs = [];
-                    for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
-                        if (row.length >= 6) {
-                            parsedTxs.push({ id: 'import_' + Date.now() + i, date: new Date(row[0]).toISOString().split('T')[0], type: row[1], name: row[2].toUpperCase(), qty: parseFloat(row[3]), price: parseFloat(row[4]), currency: row[5].toUpperCase(), dividends: parseFloat(row[6])||0 });
-                            count++;
-                        }
-                    }
-                    if (parsedTxs.length > 0) { state.transactions = [...state.transactions, ...parsedTxs]; saveData(); showToast(`${count} transactions imported!`); renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', '')); }
-                } catch (err) { showToast("Failed to parse CSV.", "error"); }
-                document.getElementById('csv-upload').value = ''; 
-            }; reader.readAsText(file);
+
+        function flashUI(elementId) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                el.classList.remove('pulse-update');
+                void el.offsetWidth;
+                el.classList.add('pulse-update');
+            }
         }
-        function exportDataJSON() {
-            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "wealth_backup.json"; document.body.appendChild(a); a.click(); a.remove();
+
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                if(id==='addTransactionModal') document.getElementById('addTxBox').classList.remove('scale-95');
+                if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.remove('scale-95');
+            }, 10);
         }
-        function importDataJSON(e) {
-            const file = e.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawData = evt.target.result.trim();
-                    if (rawData.charCodeAt(0) === 0xFEFF) rawData = rawData.slice(1);
-                    const obj = JSON.parse(rawData);
-                    if(obj.transactions) state.transactions = obj.transactions; if(obj.customPrices) state.customPrices = obj.customPrices;
-                    if(obj.history) state.history = obj.history; if(obj.targets) state.targets = obj.targets;
-                    saveData(); showToast('Backup restored successfully'); renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-                } catch(err) { showToast('Invalid backup file', 'error'); }
-                document.getElementById('json-upload-backup').value = '';
-            }; reader.readAsText(file);
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            m.classList.add('opacity-0');
+            if(id==='addTransactionModal') document.getElementById('addTxBox').classList.add('scale-95');
+            if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.add('scale-95');
+            setTimeout(() => { 
+                m.classList.add('hidden'); 
+                if(id==='addTransactionModal') {
+                    document.getElementById('txForm').reset();
+                    document.getElementById('txId').value = '';
+                    document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                }
+            }, 300);
+        }
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            const iconContainer = document.getElementById('toast-icon-container');
+            if(type === 'success') {
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                iconContainer.innerHTML = '<i data-lucide="check-circle" class="text-accent w-6 h-6"></i>';
+            } else {
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                iconContainer.innerHTML = '<i data-lucide="alert-circle" class="text-loss w-6 h-6"></i>';
+            }
+            lucide.createIcons();
+
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
 
         window.onload = init;
