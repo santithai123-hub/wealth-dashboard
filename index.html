@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.8 (Stable)</title>
+    <title>WealthOS 2.9 (Stable)</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -81,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.8 (Stable)</span>
+            <span id="last-sync" class="opacity-70">Update 2.9 (Stable)</span>
         </div>
     </aside>
 
@@ -269,11 +269,11 @@
                         <div>
                             <div class="flex justify-between items-end mb-1">
                                 <label class="block text-xs text-gray-400">Starting Principal (THB)</label>
-                                <button onclick="syncRetirementWealth()" class="text-[10px] text-accent hover:text-white transition flex items-center"><i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i> Use Actual Net Worth</button>
+                                <button onclick="syncRetirementWealth()" class="text-[10px] text-accent hover:text-white transition flex items-center"><i data-lucide="refresh-cw" class="w-3 h-3 mr-1 pointer-events-none"></i> <span class="pointer-events-none">Use Actual Net Worth</span></button>
                             </div>
                             <div class="flex items-center bg-gray-800 border border-gray-700 rounded focus-within:border-accent overflow-hidden">
                                 <span class="px-3 text-gray-400">฿</span>
-                                <input type="number" id="ret-current-wealth" class="w-full bg-transparent p-2 text-lg font-bold font-mono text-accent outline-none" oninput="updateRetirement()">
+                                <input type="number" id="ret-current-wealth" class="w-full bg-transparent p-2 text-lg font-bold font-mono text-accent outline-none" oninput="markManualAndCalculate()">
                             </div>
                         </div>
                         <div>
@@ -300,7 +300,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.8 Stable)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.9 Stable)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
@@ -336,7 +336,7 @@
 
                 <div class="glass-panel p-6 rounded-xl border border-gray-800">
                     <button onclick="clearAllData()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
-                        <i data-lucide="trash-2" class="w-4 h-4 mr-2 pointer-events-none"></i> Wipe All Local Data
+                        <i data-lucide="trash-2" class="w-4 h-4 mr-2 pointer-events-none"></i> <span class="pointer-events-none">Wipe All Local Data</span>
                     </button>
                 </div>
             </section>
@@ -459,6 +459,7 @@
         let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
         let charts = { allocation: null, history: null, retirement: null };
         let txSort = { col: 'date', asc: false };
+        let isManualRetirement = false; // Add state flag for retirement calculator
 
         function loadData() {
             try {
@@ -516,6 +517,9 @@
             const btn = document.querySelector(`.nav-btn[data-target="${viewId}"]`);
             if(btn) btn.classList.add('bg-gray-800', 'text-white');
 
+            // Reset Retirement Sync if they navigate to the tab
+            if(viewId === 'retirement') isManualRetirement = false;
+
             renderCurrentView(viewId);
         }
 
@@ -531,12 +535,12 @@
 
         function openAddAssetModal() {
             try {
-                openModal('addTransactionModal');
                 document.getElementById('txForm').reset();
                 document.getElementById('txId').value = '';
                 document.getElementById('modal-title').innerText = 'Add Asset Transaction';
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             } catch (e) { console.warn("Form reset issue", e); }
+            openModal('addTransactionModal');
         }
 
         // --- 4. MARKET DATA (Silent Background Fetch) ---
@@ -590,7 +594,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `WealthOS 2.8 (Offline Fallback)` : `WealthOS 2.8 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.9 (Offline Fallback)` : `Update 2.9 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             try {
                 const stats = calculatePortfolio();
@@ -896,18 +900,22 @@
         }
 
         // --- RETIREMENT ---
+        function markManualAndCalculate() {
+            isManualRetirement = true;
+            updateRetirement();
+        }
+
         function syncRetirementWealth() {
-            const stats = calculatePortfolio();
-            document.getElementById('ret-current-wealth').value = Math.round(stats.totalValue);
+            isManualRetirement = false;
             updateRetirement();
         }
 
         function updateRetirement() {
             let wealthInput = document.getElementById('ret-current-wealth');
+            const stats = calculatePortfolio();
             
-            // Auto-sync on first load if it's empty
-            if (wealthInput.value === "") {
-                const stats = calculatePortfolio();
+            // Auto-sync IF the user isn't currently manually overriding it
+            if (!isManualRetirement) {
                 wealthInput.value = Math.round(stats.totalValue);
             }
             
@@ -1134,6 +1142,64 @@
 
             t.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        // CSV Utils
+        function exportCSV() {
+            if(state.transactions.length === 0) return showToast("No transactions to export", "error");
+            let csv = "Date,Type,Name,Qty,Price,Currency,Dividends\n";
+            state.transactions.forEach(t => csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency},${t.dividends||0}\n`);
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); a.download = 'wealth_transactions.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("CSV Exported");
+        }
+        function importCSV(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    let rawText = evt.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    if (lines.length <= 1) return showToast("No rows found.", "error");
+                    let count = 0, parsedTxs = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
+                        if (row.length >= 6) {
+                            parsedTxs.push({ id: 'import_' + Date.now() + i, date: new Date(row[0]).toISOString().split('T')[0], type: row[1], name: row[2].toUpperCase(), qty: parseFloat(row[3]), price: parseFloat(row[4]), currency: row[5].toUpperCase(), dividends: parseFloat(row[6])||0 });
+                            count++;
+                        }
+                    }
+                    if (parsedTxs.length > 0) { 
+                        state.transactions = [...state.transactions, ...parsedTxs]; 
+                        saveData(); showToast(`${count} transactions imported!`); 
+                        document.getElementById('onboarding-state').classList.add('hidden');
+                        document.getElementById('view-dashboard').classList.remove('hidden');
+                        const activeView = document.querySelector('.view-section.active');
+                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+                    }
+                } catch (err) { showToast("Failed to parse CSV.", "error"); }
+                document.getElementById('csv-upload').value = ''; 
+            }; reader.readAsText(file);
+        }
+        function exportDataJSON() {
+            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "wealth_backup.json"; document.body.appendChild(a); a.click(); a.remove();
+        }
+        function importDataJSON(e) {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    let rawData = evt.target.result.trim();
+                    if (rawData.charCodeAt(0) === 0xFEFF) rawData = rawData.slice(1);
+                    const obj = JSON.parse(rawData);
+                    if(obj.transactions) state.transactions = obj.transactions; if(obj.customPrices) state.customPrices = obj.customPrices;
+                    if(obj.history) state.history = obj.history; if(obj.targets) state.targets = obj.targets;
+                    saveData(); showToast('Backup restored successfully'); 
+                    document.getElementById('onboarding-state').classList.add('hidden');
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    const activeView = document.querySelector('.view-section.active');
+                    if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+                } catch(err) { showToast('Invalid backup file', 'error'); }
+                document.getElementById('json-upload-backup').value = '';
+            }; reader.readAsText(file);
         }
 
         window.onload = init;
