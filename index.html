@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.1</title>
+    <title>WealthOS 2.2</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -81,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.1 Live</span>
+            <span id="last-sync" class="opacity-70">Update 2.2 Live</span>
         </div>
     </aside>
 
@@ -125,7 +125,7 @@
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
                 <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
-                <h2 class="text-3xl font-bold">Welcome to WealthOS 2.1!</h2>
+                <h2 class="text-3xl font-bold">Welcome to WealthOS 2.2!</h2>
                 <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
@@ -294,7 +294,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.1)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.2)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
@@ -304,7 +304,7 @@
                             <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
                             <span class="text-sm font-medium">Copy Data String</span>
                         </button>
-                        <button onclick="openPromptModal()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
+                        <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
                             <span class="text-sm font-medium">Paste Data String</span>
                         </button>
@@ -329,7 +329,7 @@
                 </div>
 
                 <div class="glass-panel p-6 rounded-xl border border-gray-800">
-                    <button onclick="openConfirmModal()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
+                    <button onclick="clearAllData()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
                         <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Wipe All Local Data
                     </button>
                 </div>
@@ -423,31 +423,6 @@
         </div>
     </div>
 
-    <!-- General Prompts/Confirms (Replaces Native Alerts) -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
-        <div class="glass-panel w-full max-w-sm rounded-xl shadow-2xl p-6 border border-gray-700 mx-4 text-center">
-            <i data-lucide="alert-triangle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
-            <h3 class="text-lg font-bold mb-2">Delete Everything?</h3>
-            <p class="text-sm text-gray-400 mb-6">Are you sure you want to permanently delete all your data? This cannot be undone.</p>
-            <div class="flex justify-center space-x-3">
-                <button onclick="closeModal('confirmModal')" class="px-4 py-2 rounded text-sm hover:bg-gray-800 transition w-full">Cancel</button>
-                <button id="confirm-yes-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold transition w-full">Yes, Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="promptModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
-        <div class="glass-panel w-full max-w-md rounded-xl shadow-2xl p-6 border border-gray-700 mx-4">
-            <h3 class="text-lg font-bold mb-2">Paste Data String</h3>
-            <p class="text-xs text-gray-400 mb-4">Paste the long code block you copied from your other device here to sync your wealth data.</p>
-            <textarea id="prompt-input" rows="5" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-xs font-mono outline-none focus:border-accent mb-4"></textarea>
-            <div class="flex justify-end space-x-3">
-                <button onclick="closeModal('promptModal')" class="px-4 py-2 rounded text-sm hover:bg-gray-800 transition w-full md:w-auto">Cancel</button>
-                <button id="prompt-submit-btn" class="bg-accent hover:bg-blue-700 text-white px-6 py-2 rounded text-sm font-semibold transition w-full md:w-auto">Sync Data</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-5 right-5 glass-panel border-l-4 p-4 rounded shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4">
         <div id="toast-icon-container"></div>
@@ -471,7 +446,7 @@
             document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
         }
 
-        // --- 2. STATE & SAFE LOCAL STORAGE (Reverted from IndexedDB for Mobile Safety) ---
+        // --- 2. STATE & SAFE LOCAL STORAGE ---
         let state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
         let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
         let charts = { allocation: null, history: null, retirement: null };
@@ -603,7 +578,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.1 (Offline Fallback)` : `Update 2.1 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.2 (Offline Fallback)` : `Update 2.2 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             // Take daily historical snapshot
             const stats = calculatePortfolio();
@@ -943,7 +918,7 @@
             } else showToast('Invalid price entered', 'error');
         }
 
-        // --- DATA SYNC ---
+        // --- DATA SYNC (Using safe Native Prompts for Mobile) ---
         function copyDataText() {
             try {
                 const dataStr = btoa(encodeURIComponent(JSON.stringify(state)));
@@ -953,30 +928,30 @@
             } catch (err) { showToast("Failed to copy data string.", "error"); }
         }
 
-        function openPromptModal() {
-            document.getElementById('prompt-input').value = '';
-            openModal('promptModal');
-            document.getElementById('prompt-submit-btn').onclick = () => {
-                const input = document.getElementById('prompt-input').value; if (!input) return;
-                try {
-                    const obj = JSON.parse(decodeURIComponent(atob(input.trim())));
-                    if(obj.transactions) state.transactions = obj.transactions;
-                    if(obj.customPrices) state.customPrices = obj.customPrices;
-                    if(obj.history) state.history = obj.history;
-                    if(obj.targets) state.targets = obj.targets;
-                    saveData(); closeModal('promptModal'); showToast('Data Synced Successfully!');
-                    renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-                } catch(err) { showToast("Paste Error: Invalid data string.", "error"); }
-            };
+        function pasteDataText() {
+            const input = prompt("Paste your Data String here to securely sync your devices:");
+            if (!input) return;
+            try {
+                const obj = JSON.parse(decodeURIComponent(atob(input.trim())));
+                if(obj.transactions) state.transactions = obj.transactions;
+                if(obj.customPrices) state.customPrices = obj.customPrices;
+                if(obj.history) state.history = obj.history;
+                if(obj.targets) state.targets = obj.targets;
+                saveData(); showToast('Data Synced Successfully!');
+                renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
+            } catch(err) {
+                alert("Paste Error: The text you pasted is invalid. Make sure you copied the entire string.");
+            }
         }
 
-        function openConfirmModal() {
-            openModal('confirmModal');
-            document.getElementById('confirm-yes-btn').onclick = () => {
+        function clearAllData() {
+            if(confirm("Are you sure you want to delete ALL local data? This cannot be undone.")) {
+                localStorage.removeItem('wealth_txs'); localStorage.removeItem('wealth_custom_prices');
+                localStorage.removeItem('wealth_history'); localStorage.removeItem('wealth_targets');
                 state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
-                saveData(); closeModal('confirmModal'); showToast('All local data wiped permanently.', 'success');
+                showToast('All local data wiped permanently.', 'success');
                 renderCurrentView(document.querySelector('.view-section.active').id.replace('view-', ''));
-            };
+            }
         }
 
         // CSV Utils
