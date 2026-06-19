@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.4</title>
+    <title>WealthOS 2.5</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -48,7 +48,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* FIX: Prevents icons/spans from stealing button clicks on desktop */
         button i, button span { pointer-events: none; }
     </style>
 </head>
@@ -84,7 +83,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.4 Live</span>
+            <span id="last-sync" class="opacity-70">Update 2.5 Live</span>
         </div>
     </aside>
 
@@ -128,7 +127,7 @@
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
                 <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto pointer-events-none"></i>
-                <h2 class="text-3xl font-bold pointer-events-none">Welcome to WealthOS 2.4!</h2>
+                <h2 class="text-3xl font-bold pointer-events-none">Welcome to WealthOS 2.5!</h2>
                 <p class="text-gray-400 pointer-events-none">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
@@ -297,7 +296,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold pointer-events-none">Settings & Backup (Update 2.4)</h2>
+                <h2 class="text-2xl font-semibold pointer-events-none">Settings & Backup (Update 2.5)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2 pointer-events-none">Sync Method 1: Using Text (Safest for Mobile)</h3>
@@ -521,16 +520,70 @@
             } catch(e) { console.error("Render Error in View " + viewId + ":", e); }
         }
 
-        function openAddAssetModal() {
-            try {
-                document.getElementById('txForm').reset();
-                document.getElementById('txId').value = '';
-                document.getElementById('modal-title').innerText = 'Add Asset Transaction';
-                document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
-            } catch (e) {
-                console.warn("Form reset issue", e);
+        // UPDATE 2.5: Bulletproof Modal Logic
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            
+            // Immediately unhide to guarantee visual response
+            m.classList.remove('hidden');
+            
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                if (id === 'addTransactionModal') {
+                    const box = document.getElementById('addTxBox');
+                    if (box) box.classList.remove('scale-95');
+                } else if (id === 'updatePriceModal') {
+                    const box = document.getElementById('updatePriceBox');
+                    if (box) box.classList.remove('scale-95');
+                }
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            m.classList.add('opacity-0');
+            
+            if (id === 'addTransactionModal') {
+                const box = document.getElementById('addTxBox');
+                if (box) box.classList.add('scale-95');
+            } else if (id === 'updatePriceModal') {
+                const box = document.getElementById('updatePriceBox');
+                if (box) box.classList.add('scale-95');
             }
+            
+            setTimeout(() => { 
+                m.classList.add('hidden'); 
+            }, 300);
+        }
+
+        function openAddAssetModal() {
+            // First, open the visual window so the user sees action immediately
             openModal('addTransactionModal');
+            
+            // Second, attempt to reset form data safely
+            try {
+                const form = document.getElementById('txForm');
+                if (form) form.reset();
+                
+                const title = document.getElementById('modal-title');
+                if (title) title.innerText = 'Add Asset Transaction';
+                
+                const idField = document.getElementById('txId');
+                if (idField) idField.value = '';
+                
+                const dateField = document.getElementById('txDate');
+                if (dateField) {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    dateField.value = `${year}-${month}-${day}`;
+                }
+            } catch (e) {
+                console.warn("Minor form reset error, ignored to keep UI responsive.", e);
+            }
         }
 
         // --- 4. MARKET DATA (Silent Background Fetch) ---
@@ -585,7 +638,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.4 (Offline Fallback)` : `Update 2.4 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.5 (Offline Fallback)` : `Update 2.5 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             const stats = calculatePortfolio();
             takeSnapshot(stats);
