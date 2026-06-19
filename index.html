@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.6</title>
+    <title>WealthOS 2.7 (Stable)</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -47,8 +47,6 @@
         .view-section.active { display: block; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        button i, button span { pointer-events: none; }
     </style>
 </head>
 <body class="overflow-hidden flex h-screen text-sm">
@@ -56,7 +54,7 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 glass-panel border-r border-gray-800 flex flex-col absolute md:relative z-30 h-full transition-transform transform -translate-x-full md:translate-x-0 bg-bgDark">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
-            <div class="flex items-center space-x-2 pointer-events-none">
+            <div class="flex items-center space-x-2">
                 <i data-lucide="bar-chart-2" class="text-accent"></i>
                 <span class="font-bold text-lg tracking-wider">WEALTH<span class="text-accent">OS</span></span>
             </div>
@@ -83,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.6 Live</span>
+            <span id="last-sync" class="opacity-70">Update 2.7 (Stable)</span>
         </div>
     </aside>
 
@@ -99,16 +97,16 @@
                     <i data-lucide="menu"></i>
                 </button>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-usd-thb">
-                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">USD/THB</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-usd-thb">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs">USD/THB</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-usd-thb">--</span>
                 </div>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-btc-usd">
-                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">BTC/USD</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-btc-usd">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs">BTC/USD</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-btc-usd">--</span>
                 </div>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-gold">
-                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">TH Gold</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-gold">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs">TH Gold</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-gold">--</span>
                 </div>
             </div>
             <div class="flex items-center space-x-2 md:space-x-3 ml-2 shrink-0">
@@ -126,33 +124,33 @@
 
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
-                <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto pointer-events-none"></i>
-                <h2 class="text-3xl font-bold pointer-events-none">Welcome to WealthOS 2.6!</h2>
-                <p class="text-gray-400 pointer-events-none">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
+                <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
+                <h2 class="text-3xl font-bold">Welcome to WealthOS!</h2>
+                <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
             
             <!-- VIEW: DASHBOARD -->
             <section id="view-dashboard" class="view-section active space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col pointer-events-none">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Net Worth</div>
                         <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-value">฿0.00</div>
                         <div class="flex justify-between text-xs mt-auto pt-3 border-t border-gray-800">
                             <span class="text-gray-500 whitespace-nowrap overflow-x-auto hide-scrollbar">Total Invested: <span id="dash-total-cost" class="font-mono text-gray-300">฿0.00</span></span>
                         </div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col pointer-events-none">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Return (Inc. Divs)</div>
                         <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-pl">฿0.00</div>
                         <div class="text-sm font-mono font-medium mt-auto" id="dash-total-pl-pct">0.00%</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col pointer-events-none">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Top Performing Asset</div>
                         <div class="text-lg sm:text-xl md:text-2xl font-bold mb-2 text-accent whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-top-asset">None</div>
                         <div class="text-sm text-gray-400 mt-auto">Based on Total Return</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col pointer-events-none">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col">
                         <div class="absolute right-0 top-0 opacity-10"><i data-lucide="pie-chart" class="w-24 h-24"></i></div>
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider z-10">Asset Count</div>
                         <div class="text-2xl sm:text-3xl font-mono font-bold text-gray-200 mb-2 z-10" id="dash-asset-count">0</div>
@@ -162,11 +160,11 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-panel p-5 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-semibold mb-4 pointer-events-none">Historical Net Worth</h3>
+                        <h3 class="text-lg font-semibold mb-4">Historical Net Worth</h3>
                         <div class="h-72 w-full"><canvas id="historyChart"></canvas></div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-semibold mb-4 pointer-events-none">Asset Allocation</h3>
+                        <h3 class="text-lg font-semibold mb-4">Asset Allocation</h3>
                         <div class="h-64 w-full relative flex items-center justify-center"><canvas id="allocationChart"></canvas></div>
                     </div>
                 </div>
@@ -175,8 +173,8 @@
             <!-- VIEW: PORTFOLIO & ASSETS -->
             <section id="view-portfolio" class="view-section space-y-6">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
-                    <h2 class="text-xl font-semibold pointer-events-none">Portfolio & Assets Breakdown</h2>
-                    <p class="text-sm text-gray-400 pointer-events-none">Your transactions grouped by asset to show total holdings.</p>
+                    <h2 class="text-xl font-semibold">Portfolio & Assets Breakdown</h2>
+                    <p class="text-sm text-gray-400">Your transactions grouped by asset to show total holdings.</p>
                 </div>
                 
                 <div class="flex space-x-4 border-b border-gray-800 mb-6 overflow-x-auto hide-scrollbar">
@@ -194,8 +192,8 @@
             <section id="view-transactions" class="view-section space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold pointer-events-none">Transactions Log</h2>
-                        <p class="text-sm text-gray-400 mt-1 pointer-events-none">Click table headers to sort your data.</p>
+                        <h2 class="text-xl font-semibold">Transactions Log</h2>
+                        <p class="text-sm text-gray-400 mt-1">Click table headers to sort your data.</p>
                     </div>
                 </div>
                 
@@ -203,14 +201,14 @@
                     <table class="w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase cursor-pointer">
                             <tr>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('date')">Date <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('name')">Asset Name <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('qty')">Qty <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('cost')">Cost (Unit) <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('price')">Current Price <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('value')">Current Value <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('pnl')">Total Return <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
-                                <th class="p-4 text-center pointer-events-none">Actions</th>
+                                <th class="p-4 hover:text-white transition" onclick="sortTx('date')">Date <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 hover:text-white transition" onclick="sortTx('name')">Asset Name <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('qty')">Qty <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('cost')">Cost (Unit) <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('price')">Current Price <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('value')">Current Value <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('pnl')">Total Return <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
+                                <th class="p-4 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
@@ -220,35 +218,35 @@
 
             <!-- VIEW: TARGET ALLOCATION (REBALANCE) -->
             <section id="view-rebalance" class="view-section space-y-6">
-                <h2 class="text-2xl font-semibold mb-2 pointer-events-none">Target Allocation & Rebalancing</h2>
-                <p class="text-gray-400 text-sm mb-6 pointer-events-none">Set your ideal portfolio percentages. We will calculate exactly what to buy or sell to hit your goal.</p>
+                <h2 class="text-2xl font-semibold mb-2">Target Allocation & Rebalancing</h2>
+                <p class="text-gray-400 text-sm mb-6">Set your ideal portfolio percentages. We will calculate exactly what to buy or sell to hit your goal.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Crypto Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1">Crypto Target (%)</label>
                         <input type="number" id="tgt-crypto" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Gold Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1">Gold Target (%)</label>
                         <input type="number" id="tgt-gold" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Thai Stocks (SET) Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1">Thai Stocks (SET) Target (%)</label>
                         <input type="number" id="tgt-set" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Fixed/Savings Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1">Fixed/Savings Target (%)</label>
                         <input type="number" id="tgt-fixed" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                 </div>
 
-                <div id="rebalance-warning" class="hidden bg-red-900/40 border border-red-500 text-red-200 p-4 rounded-xl mb-6 pointer-events-none">
+                <div id="rebalance-warning" class="hidden bg-red-900/40 border border-red-500 text-red-200 p-4 rounded-xl mb-6">
                     <strong>Warning:</strong> Your target percentages do not equal 100%. Please adjust them.
                 </div>
 
                 <div class="glass-panel rounded-xl overflow-hidden overflow-x-auto border border-gray-800">
                     <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase pointer-events-none">
+                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase">
                             <tr>
                                 <th class="p-4">Asset Class</th>
                                 <th class="p-4">Current Allocation</th>
@@ -256,34 +254,34 @@
                                 <th class="p-4">Action Needed (THB)</th>
                             </tr>
                         </thead>
-                        <tbody id="rebalance-table" class="divide-y divide-gray-800 font-mono text-sm pointer-events-none"></tbody>
+                        <tbody id="rebalance-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
                     </table>
                 </div>
             </section>
 
             <!-- VIEW: RETIREMENT -->
             <section id="view-retirement" class="view-section space-y-6">
-                <h2 class="text-2xl font-semibold mb-2 pointer-events-none">Retirement Depletion Calculator</h2>
-                <p class="text-gray-400 text-sm mb-6 pointer-events-none">Calculate how long your portfolio will last based on your monthly expenses.</p>
+                <h2 class="text-2xl font-semibold mb-2">Retirement Depletion Calculator</h2>
+                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Current Total Net Wealth</label>
-                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar pointer-events-none" id="ret-current-wealth">฿0.00</div>
+                            <label class="block text-xs text-gray-400 mb-1">Current Total Net Wealth</label>
+                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Monthly Expenses Target (THB)</label>
+                            <label class="block text-xs text-gray-400 mb-1">Monthly Expenses Target (THB)</label>
                             <input type="number" id="ret-monthly-usage" value="50000" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Expected Annual Return (%)</label>
+                            <label class="block text-xs text-gray-400 mb-1">Expected Annual Return (%)</label>
                             <input type="number" id="ret-return" value="5.0" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                     </div>
                     
                     <div class="lg:col-span-2 space-y-6">
-                        <div class="glass-panel p-6 rounded-xl text-center border border-gray-800 pointer-events-none">
+                        <div class="glass-panel p-6 rounded-xl text-center border border-gray-800">
                             <div class="text-xs text-gray-400 uppercase tracking-wider mb-2">Your Wealth Will Last For</div>
                             <div class="text-4xl md:text-5xl font-bold font-mono text-profit mb-2" id="ret-longevity">0 Yrs, 0 Mos</div>
                         </div>
@@ -296,11 +294,11 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold pointer-events-none">Settings & Backup (Update 2.6)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.7 Stable)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2 pointer-events-none">Sync Method 1: Using Text (Safest for Mobile)</h3>
-                    <p class="text-xs text-gray-400 pointer-events-none">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
+                    <p class="text-xs text-gray-400">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
@@ -314,7 +312,7 @@
                 </div>
 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2 pointer-events-none">Sync Method 2: Local JSON Files</h3>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Local JSON Files</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
@@ -322,7 +320,7 @@
                         </button>
                         <div class="relative w-full">
                             <input type="file" id="json-upload-backup" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importDataJSON(event)">
-                            <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700 pointer-events-none">
+                            <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700">
                                 <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400"></i>
                                 <span class="text-sm font-medium">Restore (JSON File)</span>
                             </div>
@@ -403,13 +401,13 @@
     <div id="updatePriceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
         <div class="glass-panel w-full max-w-sm rounded-xl shadow-2xl p-6 border border-gray-700 transform scale-95 transition-transform mx-4" id="updatePriceBox">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold" id="update-modal-title">Update Market Price</h3>
+                <h3 class="text-lg font-bold">Update Market Price</h3>
                 <button type="button" onclick="closeModal('updatePriceModal')" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
             </div>
             <p class="text-sm text-gray-300 mb-4">Set current price for <strong id="upd-asset-name" class="text-accent">Asset</strong> to calculate Profit/Loss.</p>
             
             <a id="upd-google-link" href="#" target="_blank" class="flex items-center justify-center w-full bg-white text-black font-semibold py-3 rounded mb-4 hover:bg-gray-200 transition">
-                <i data-lucide="search" class="w-4 h-4 mr-2 pointer-events-none"></i> <span class="pointer-events-none">Search Price on Google</span>
+                <i data-lucide="search" class="w-4 h-4 mr-2"></i> Search Price on Google
             </a>
 
             <div class="mb-4">
@@ -435,17 +433,19 @@
     <script>
         // --- 1. PWA INJECTION ---
         function initPWA() {
-            const manifest = {
-                name: "WealthOS Dashboard",
-                short_name: "WealthOS",
-                start_url: ".",
-                display: "standalone",
-                background_color: "#0b0e14",
-                theme_color: "#2962FF",
-                icons: [{"src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232962FF'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml"}]
-            };
-            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
+            try {
+                const manifest = {
+                    name: "WealthOS Dashboard",
+                    short_name: "WealthOS",
+                    start_url: ".",
+                    display: "standalone",
+                    background_color: "#0b0e14",
+                    theme_color: "#2962FF",
+                    icons: [{"src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232962FF'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E", "sizes": "192x192", "type": "image/svg+xml"}]
+                };
+                const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+                document.getElementById('dynamic-manifest').href = URL.createObjectURL(blob);
+            } catch (e) { console.error("PWA Init Error", e); }
         }
 
         // --- 2. STATE & SAFE LOCAL STORAGE ---
@@ -464,10 +464,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
-            localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
-            localStorage.setItem('wealth_history', JSON.stringify(state.history));
-            localStorage.setItem('wealth_targets', JSON.stringify(state.targets));
+            try {
+                localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                localStorage.setItem('wealth_history', JSON.stringify(state.history));
+                localStorage.setItem('wealth_targets', JSON.stringify(state.targets));
+            } catch(e) { console.error("Save Error", e); }
         }
 
         function init() {
@@ -498,6 +500,7 @@
         function toggleSidebarIfMobile() { if (window.innerWidth < 768) toggleSidebar(); }
 
         function nav(viewId) {
+            document.getElementById('onboarding-state').classList.add('hidden'); 
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-gray-800', 'text-white'));
             
@@ -520,61 +523,14 @@
             } catch(e) { console.error("Render Error in View " + viewId + ":", e); }
         }
 
-        function openModal(id) {
-            const m = document.getElementById(id);
-            if(!m) return;
-            m.classList.remove('hidden');
-            setTimeout(() => {
-                m.classList.remove('opacity-0');
-                if (id === 'addTransactionModal') {
-                    const box = document.getElementById('addTxBox');
-                    if (box) box.classList.remove('scale-95');
-                } else if (id === 'updatePriceModal') {
-                    const box = document.getElementById('updatePriceBox');
-                    if (box) box.classList.remove('scale-95');
-                }
-            }, 10);
-        }
-
-        function closeModal(id) {
-            const m = document.getElementById(id);
-            if(!m) return;
-            m.classList.add('opacity-0');
-            
-            if (id === 'addTransactionModal') {
-                const box = document.getElementById('addTxBox');
-                if (box) box.classList.add('scale-95');
-            } else if (id === 'updatePriceModal') {
-                const box = document.getElementById('updatePriceBox');
-                if (box) box.classList.add('scale-95');
-            }
-            
-            setTimeout(() => { 
-                m.classList.add('hidden'); 
-            }, 300);
-        }
-
         function openAddAssetModal() {
-            openModal('addTransactionModal');
             try {
-                const form = document.getElementById('txForm');
-                if (form) form.reset();
-                const title = document.getElementById('modal-title');
-                if (title) title.innerText = 'Add Asset Transaction';
-                const idField = document.getElementById('txId');
-                if (idField) idField.value = '';
-                
-                const dateField = document.getElementById('txDate');
-                if (dateField) {
-                    const today = new Date();
-                    const year = today.getFullYear();
-                    const month = String(today.getMonth() + 1).padStart(2, '0');
-                    const day = String(today.getDate()).padStart(2, '0');
-                    dateField.value = `${year}-${month}-${day}`;
-                }
-            } catch (e) {
-                console.warn("Minor form reset error, ignored to keep UI responsive.", e);
-            }
+                document.getElementById('txForm').reset();
+                document.getElementById('txId').value = '';
+                document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+            } catch (e) { console.warn("Form reset issue", e); }
+            openModal('addTransactionModal');
         }
 
         // --- 4. MARKET DATA (Silent Background Fetch) ---
@@ -585,7 +541,7 @@
             try {
                 let erRes = await fetch('https://open.er-api.com/v6/latest/USD');
                 let erData = await erRes.json();
-                market.usd_thb = erData.rates.THB;
+                market.usd_thb = erData.rates.THB || 36.00;
                 document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2);
                 flashUI('ui-usd-thb');
             } catch(e) { offlineMode = true; document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2); }
@@ -593,7 +549,7 @@
             try {
                 let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
                 let d3 = await r3.json();
-                market.prices['BTC'] = d3.bitcoin.usd * market.usd_thb;
+                market.prices['BTC'] = (d3.bitcoin.usd * market.usd_thb) || 0;
                 document.getElementById('ticker-btc-usd').innerText = `$${formatNum(d3.bitcoin.usd, 0)}`;
                 flashUI('ui-btc-usd');
             } catch(e) { offlineMode = true; market.prices['BTC'] = 65000 * market.usd_thb; }
@@ -602,12 +558,11 @@
                 let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
                 let d3 = await r3.json();
                 let goldThb = (d3['pax-gold'].usd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
-                market.prices['GOLD'] = Math.round(goldThb / 50) * 50;
+                market.prices['GOLD'] = Math.round(goldThb / 50) * 50 || 0;
                 document.getElementById('ticker-gold').innerText = `฿${formatNum(market.prices['GOLD'], 0)}`;
                 flashUI('ui-gold');
             } catch(e) { offlineMode = true; market.prices['GOLD'] = 40000; }
 
-            // Thai Stocks via Multi-Proxy Yahoo Finance
             let setAssets = new Set(state.transactions.filter(t => t.type === 'SET').map(t => (t.name || "").toUpperCase().trim()));
             for (let baseName of setAssets) {
                 if(!baseName) continue;
@@ -629,19 +584,18 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.6 (Offline Fallback)` : `Update 2.6 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.7 (Offline Fallback)` : `Update 2.7 - Last sync: ${new Date().toLocaleTimeString()}`;
             
-            const stats = calculatePortfolio();
-            takeSnapshot(stats);
-            
-            const activeViewEl = document.querySelector('.view-section.active');
-            if(activeViewEl) {
-                renderCurrentView(activeViewEl.id.replace('view-', ''));
-            }
+            try {
+                const stats = calculatePortfolio();
+                takeSnapshot(stats);
+                const activeViewEl = document.querySelector('.view-section.active');
+                if(activeViewEl) renderCurrentView(activeViewEl.id.replace('view-', ''));
+            } catch(e) { console.error("Render after fetch error:", e); }
         }
 
         function takeSnapshot(stats) {
-            if (!stats || stats.totalValue <= 0) return;
+            if (!stats || isNaN(stats.totalValue) || stats.totalValue <= 0) return;
             let today = new Date().toISOString().split('T')[0];
             let lastSnap = state.history.length > 0 ? state.history[state.history.length - 1] : null;
             
@@ -651,7 +605,7 @@
             saveData();
         }
 
-        // --- 5. VALUATION ENGINE ---
+        // --- 5. SAFE VALUATION ENGINE ---
         function getAssetMarketPrice(tx) {
             let n = (tx.name || "UNKNOWN").toUpperCase();
             if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN') && market.prices['BTC'] > 0) return market.prices['BTC'];
@@ -659,7 +613,9 @@
             if (tx.type === 'SET' && market.prices[n] > 0) return market.prices[n];
             if (tx.type === 'SET' && market.prices[n + '.BK'] > 0) return market.prices[n + '.BK'];
             if (state.customPrices[n]) return state.customPrices[n];
-            return (parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1);
+            
+            let price = parseFloat(tx.price);
+            return (isNaN(price) ? 0 : price) * (tx.currency === 'USD' ? market.usd_thb : 1);
         }
 
         function calculatePortfolio() {
@@ -667,17 +623,17 @@
             let assetMap = {}, grouped = {};
 
             state.transactions.forEach(tx => {
-                // Update 2.6: Math Safety Filter applied here
-                let safePrice = parseFloat(tx.price) || 0;
-                let safeQty = parseFloat(tx.qty) || 0;
-                let safeDiv = parseFloat(tx.dividends) || 0;
+                let p = parseFloat(tx.price), q = parseFloat(tx.qty), d = parseFloat(tx.dividends);
+                p = isNaN(p) ? 0 : p;
+                q = isNaN(q) ? 0 : q;
+                d = isNaN(d) ? 0 : d;
 
-                let costThb = safePrice * safeQty * (tx.currency === 'USD' ? market.usd_thb : 1);
-                let currentValThb = getAssetMarketPrice(tx) * safeQty;
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
+                let currentValThb = getAssetMarketPrice(tx) * q;
 
                 totalCost += costThb;
                 totalValue += currentValThb;
-                totalDividends += safeDiv;
+                totalDividends += d;
 
                 if (!assetMap[tx.type]) assetMap[tx.type] = 0;
                 assetMap[tx.type] += currentValThb;
@@ -686,7 +642,7 @@
                 if(!grouped[name]) grouped[name] = { cost: 0, val: 0, div: 0 };
                 grouped[name].cost += costThb;
                 grouped[name].val += currentValThb;
-                grouped[name].div += safeDiv;
+                grouped[name].div += d;
             });
 
             let topAsset = "None", topAssetProfit = -Infinity;
@@ -716,13 +672,13 @@
             plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
             
             const plPctEl = document.getElementById('dash-total-pl-pct');
-            plPctEl.innerText = `${totalReturn >= 0 ? '+' : ''}${returnPct.toFixed(2)}%`;
+            plPctEl.innerText = `${totalReturn >= 0 ? '+' : ''}${formatNum(returnPct, 2)}%`;
             plPctEl.className = `text-sm font-mono font-medium mt-auto ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
 
             document.getElementById('dash-top-asset').innerText = stats.topAsset;
             document.getElementById('dash-asset-count').innerText = new Set(state.transactions.map(t => (t.name || "").toUpperCase())).size;
             
-            renderCharts(stats);
+            try { renderCharts(stats); } catch(e) { console.error("Chart Error", e); }
         }
 
         function renderCharts(stats) {
@@ -763,23 +719,22 @@
             container.innerHTML = '';
             
             let filteredTxs = filterType === 'All' ? state.transactions : state.transactions.filter(t => t.type === filterType || (filterType==='Overview' && t.type));
-            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 pointer-events-none">No assets found in ${filterType}.</div>`; return; }
+            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${filterType}.</div>`; return; }
 
             let grouped = {};
             filteredTxs.forEach(tx => {
                 let name = (tx.name || "UNKNOWN").toUpperCase();
-                let safePrice = parseFloat(tx.price) || 0;
-                let safeQty = parseFloat(tx.qty) || 0;
-                let safeDiv = parseFloat(tx.dividends) || 0;
+                let p = parseFloat(tx.price), q = parseFloat(tx.qty), d = parseFloat(tx.dividends);
+                p = isNaN(p) ? 0 : p; q = isNaN(q) ? 0 : q; d = isNaN(d) ? 0 : d;
                 
-                let costThb = safePrice * safeQty * (tx.currency === 'USD' ? market.usd_thb : 1);
-                let currentValThb = getAssetMarketPrice(tx) * safeQty;
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
+                let currentValThb = getAssetMarketPrice(tx) * q;
 
                 if(!grouped[name]) grouped[name] = { name: name, type: tx.type, qty: 0, cost: 0, value: 0, div: 0 };
-                grouped[name].qty += safeQty;
+                grouped[name].qty += q;
                 grouped[name].cost += costThb;
                 grouped[name].value += currentValThb;
-                grouped[name].div += safeDiv;
+                grouped[name].div += d;
             });
 
             Object.values(grouped).forEach(asset => {
@@ -788,7 +743,7 @@
                 let isProfit = totalReturn >= 0;
 
                 let card = `
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 pointer-events-none">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800">
                         <div class="flex justify-between items-start mb-4">
                             <div><h4 class="font-bold text-lg text-gray-200">${asset.name}</h4><span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span></div>
                             <div class="text-right"><div class="text-xs text-gray-500">Total Units</div><div class="font-mono font-semibold">${formatNum(asset.qty, 4)}</div></div>
@@ -799,7 +754,7 @@
                             ${asset.div > 0 ? `<div class="flex justify-between text-sm text-green-400"><span class="opacity-80">Dividends:</span><span class="font-mono">+฿${formatNum(asset.div, 2)}</span></div>` : ''}
                             <div class="flex justify-between text-sm pt-3 mt-3 border-t border-gray-800">
                                 <span class="text-gray-400">Total Return:</span>
-                                <span class="font-mono font-bold ${isProfit ? 'text-profit' : 'text-loss'}">${isProfit ? '+' : ''}฿${formatNum(totalReturn, 2)} <span class="text-[10px] opacity-80">(${returnPct.toFixed(2)}%)</span></span>
+                                <span class="font-mono font-bold ${isProfit ? 'text-profit' : 'text-loss'}">${isProfit ? '+' : ''}฿${formatNum(totalReturn, 2)} <span class="text-[10px] opacity-80">(${formatNum(returnPct, 2)}%)</span></span>
                             </div>
                         </div>
                     </div>
@@ -823,16 +778,23 @@
 
             let sorted = [...state.transactions].sort((a,b) => {
                 let vA, vB;
-                let costA = (parseFloat(a.qty)||0) * (parseFloat(a.price)||0) * (a.currency==='USD'?market.usd_thb:1);
-                let costB = (parseFloat(b.qty)||0) * (parseFloat(b.price)||0) * (b.currency==='USD'?market.usd_thb:1);
+                let qA = parseFloat(a.qty); qA = isNaN(qA) ? 0 : qA;
+                let qB = parseFloat(b.qty); qB = isNaN(qB) ? 0 : qB;
+                let pA = parseFloat(a.price); pA = isNaN(pA) ? 0 : pA;
+                let pB = parseFloat(b.price); pB = isNaN(pB) ? 0 : pB;
+                let dA = parseFloat(a.dividends); dA = isNaN(dA) ? 0 : dA;
+                let dB = parseFloat(b.dividends); dB = isNaN(dB) ? 0 : dB;
                 
-                if(txSort.col === 'date') { vA = new Date(a.date).getTime(); vB = new Date(b.date).getTime(); }
+                let costA = qA * pA * (a.currency==='USD'?market.usd_thb:1);
+                let costB = qB * pB * (b.currency==='USD'?market.usd_thb:1);
+                
+                if(txSort.col === 'date') { vA = new Date(a.date).getTime()||0; vB = new Date(b.date).getTime()||0; }
                 if(txSort.col === 'name') { vA = (a.name||"").toUpperCase(); vB = (b.name||"").toUpperCase(); }
-                if(txSort.col === 'qty') { vA = parseFloat(a.qty)||0; vB = parseFloat(b.qty)||0; }
-                if(txSort.col === 'cost') { vA = costA / (parseFloat(a.qty)||1); vB = costB / (parseFloat(b.qty)||1); }
+                if(txSort.col === 'qty') { vA = qA; vB = qB; }
+                if(txSort.col === 'cost') { vA = costA / (qA||1); vB = costB / (qB||1); }
                 if(txSort.col === 'price') { vA = getAssetMarketPrice(a); vB = getAssetMarketPrice(b); }
-                if(txSort.col === 'value') { vA = getAssetMarketPrice(a) * (parseFloat(a.qty)||0); vB = getAssetMarketPrice(b) * (parseFloat(b.qty)||0); }
-                if(txSort.col === 'pnl') { vA = (getAssetMarketPrice(a)*(parseFloat(a.qty)||0)) - costA + (parseFloat(a.dividends)||0); vB = (getAssetMarketPrice(b)*(parseFloat(b.qty)||0)) - costB + (parseFloat(b.dividends)||0); }
+                if(txSort.col === 'value') { vA = getAssetMarketPrice(a) * qA; vB = getAssetMarketPrice(b) * qB; }
+                if(txSort.col === 'pnl') { vA = (getAssetMarketPrice(a)*qA) - costA + dA; vB = (getAssetMarketPrice(b)*qB) - costB + dB; }
 
                 if (vA < vB) return txSort.asc ? -1 : 1;
                 if (vA > vB) return txSort.asc ? 1 : -1;
@@ -840,15 +802,14 @@
             });
 
             sorted.forEach(tx => {
-                // Update 2.6: Math Safety Filter
-                let safePrice = parseFloat(tx.price) || 0;
-                let safeQty = parseFloat(tx.qty) || 0;
-                let safeDiv = parseFloat(tx.dividends) || 0;
+                let q = parseFloat(tx.qty); q = isNaN(q) ? 0 : q;
+                let p = parseFloat(tx.price); p = isNaN(p) ? 0 : p;
+                let d = parseFloat(tx.dividends); d = isNaN(d) ? 0 : d;
                 
-                let costThb = safePrice * safeQty * (tx.currency === 'USD' ? market.usd_thb : 1);
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let marketUnitThb = getAssetMarketPrice(tx);
-                let currentValThb = marketUnitThb * safeQty;
-                let totalReturn = currentValThb - costThb + safeDiv;
+                let currentValThb = marketUnitThb * q;
+                let totalReturn = currentValThb - costThb + d;
                 let returnPct = costThb > 0 ? (totalReturn / costThb) * 100 : 0;
                 
                 let txNameUpper = (tx.name||"").toUpperCase();
@@ -858,20 +819,20 @@
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
                         <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
                         <td class="p-4"><div class="font-bold text-gray-200">${txNameUpper}</div><div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div></td>
-                        <td class="p-4 text-right">${formatNum(safeQty, 4)}</td>
-                        <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (safeQty || 1), 2)}</td>
+                        <td class="p-4 text-right">${formatNum(q, 4)}</td>
+                        <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (q || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
-                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline pointer-events-none"></i></button>` : `<span class="ml-2 text-accent text-[10px] pointer-events-none">Live</span>`}
+                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px]">Live</span>`}
                         </td>
                         <td class="p-4 text-right font-bold text-gray-200">฿${formatNum(currentValThb, 2)}</td>
                         <td class="p-4 text-right font-bold ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}">
                             ${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}<br>
-                            <span class="text-[10px] opacity-80 pointer-events-none">${returnPct.toFixed(2)}%</span>
+                            <span class="text-[10px] opacity-80">${formatNum(returnPct, 2)}%</span>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline pointer-events-none"></i></button>
-                            <button onclick="deleteTx('${tx.id}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline pointer-events-none"></i></button>
+                            <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline"></i></button>
+                            <button onclick="deleteTx('${tx.id}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline"></i></button>
                         </td>
                     </tr>
                 `;
@@ -896,7 +857,8 @@
             
             let sum = 0;
             ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
-                let val = parseFloat(document.getElementById(`tgt-${k.toLowerCase()}`).value) || 0;
+                let val = parseFloat(document.getElementById(`tgt-${k.toLowerCase()}`).value);
+                val = isNaN(val) ? 0 : val;
                 state.targets[k] = val;
                 sum += val;
             });
@@ -915,10 +877,10 @@
                 let actionColor = diff > 100 ? "text-profit" : (diff < -100 ? "text-loss" : "text-gray-400");
                 
                 let row = `
-                    <tr class="border-b border-gray-800 hover:bg-gray-800/50 pointer-events-none">
+                    <tr class="border-b border-gray-800 hover:bg-gray-800/50">
                         <td class="p-4 font-bold text-gray-200">${k}</td>
-                        <td class="p-4">${currentPct.toFixed(1)}% <span class="text-gray-500 text-xs">(฿${formatNum(currentVal, 0)})</span></td>
-                        <td class="p-4 text-accent font-bold">${targetPct}% <span class="text-gray-500 text-xs font-normal">(฿${formatNum(targetVal, 0)})</span></td>
+                        <td class="p-4">${formatNum(currentPct, 1)}% <span class="text-gray-500 text-xs">(฿${formatNum(currentVal, 0)})</span></td>
+                        <td class="p-4 text-accent font-bold">${formatNum(targetPct, 1)}% <span class="text-gray-500 text-xs font-normal">(฿${formatNum(targetVal, 0)})</span></td>
                         <td class="p-4 font-bold ${actionColor}">${action} ฿${formatNum(Math.abs(diff), 0)}</td>
                     </tr>
                 `;
@@ -927,39 +889,43 @@
             saveData();
         }
 
-        // --- ACTIONS ---
+        // --- SAFE FORM ACTIONS ---
         function handleTransactionSubmit(e) {
             e.preventDefault();
-            const id = document.getElementById('txId').value || Date.now().toString();
-            
-            // Update 2.6: Secure Math Extractions
-            const safeQty = parseFloat(document.getElementById('txQty').value) || 0;
-            const safePrice = parseFloat(document.getElementById('txPrice').value) || 0;
-            const safeDivs = parseFloat(document.getElementById('txDividends').value) || 0;
-
-            const tx = {
-                id: id, 
-                type: document.getElementById('txType').value || 'Crypto',
-                name: (document.getElementById('txName').value || 'UNNAMED').trim(),
-                date: document.getElementById('txDate').value || new Date().toISOString().split('T')[0],
-                qty: safeQty,
-                price: safePrice,
-                currency: document.getElementById('txCurrency').value || 'THB',
-                dividends: safeDivs
-            };
-            
-            const existingIdx = state.transactions.findIndex(t => t.id === id);
-            if(existingIdx >= 0) state.transactions[existingIdx] = tx; else state.transactions.push(tx);
-            
-            saveData();
-            closeModal('addTransactionModal');
-            showToast('Asset transaction saved successfully');
-            
-            document.getElementById('onboarding-state').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
-            
-            const activeView = document.querySelector('.view-section.active');
-            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            try {
+                const id = document.getElementById('txId').value || Date.now().toString();
+                
+                let rQty = parseFloat(document.getElementById('txQty').value);
+                let rPrice = parseFloat(document.getElementById('txPrice').value);
+                let rDiv = parseFloat(document.getElementById('txDividends').value);
+                
+                const tx = {
+                    id: id, 
+                    type: document.getElementById('txType').value || 'Crypto',
+                    name: (document.getElementById('txName').value || 'UNNAMED').trim(),
+                    date: document.getElementById('txDate').value || new Date().toISOString().split('T')[0],
+                    qty: isNaN(rQty) ? 0 : rQty,
+                    price: isNaN(rPrice) ? 0 : rPrice,
+                    currency: document.getElementById('txCurrency').value || 'THB',
+                    dividends: isNaN(rDiv) ? 0 : rDiv
+                };
+                
+                const existingIdx = state.transactions.findIndex(t => t.id === id);
+                if(existingIdx >= 0) state.transactions[existingIdx] = tx; else state.transactions.push(tx);
+                
+                saveData();
+                closeModal('addTransactionModal');
+                showToast('Asset transaction saved successfully');
+                
+                document.getElementById('onboarding-state').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                
+                const activeView = document.querySelector('.view-section.active');
+                if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            } catch (err) {
+                console.error("Save error:", err);
+                showToast("Error saving data. Please check inputs.", "error");
+            }
         }
 
         function deleteTx(id) {
@@ -1044,62 +1010,65 @@
             }
         }
 
-        // CSV Utils
-        function exportCSV() {
-            if(state.transactions.length === 0) return showToast("No transactions to export", "error");
-            let csv = "Date,Type,Name,Qty,Price,Currency,Dividends\n";
-            state.transactions.forEach(t => csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency},${t.dividends||0}\n`);
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); a.download = 'wealth_transactions.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("CSV Exported");
+        // --- BULLETPROOF UTILS ---
+        function formatNum(num, decimals = 2) {
+            // Absolute safety net against Intl.NumberFormat RangeError crashes
+            if (isNaN(num) || num === null || num === undefined) num = 0;
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num);
         }
-        function importCSV(e) {
-            const file = e.target.files[0]; if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawText = evt.target.result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                    if (lines.length <= 1) return showToast("No rows found.", "error");
-                    let count = 0, parsedTxs = [];
-                    for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
-                        if (row.length >= 6) {
-                            parsedTxs.push({ id: 'import_' + Date.now() + i, date: new Date(row[0]).toISOString().split('T')[0], type: row[1], name: row[2].toUpperCase(), qty: parseFloat(row[3]), price: parseFloat(row[4]), currency: row[5].toUpperCase(), dividends: parseFloat(row[6])||0 });
-                            count++;
-                        }
-                    }
-                    if (parsedTxs.length > 0) { 
-                        state.transactions = [...state.transactions, ...parsedTxs]; 
-                        saveData(); showToast(`${count} transactions imported!`); 
-                        document.getElementById('onboarding-state').classList.add('hidden');
-                        document.getElementById('view-dashboard').classList.remove('hidden');
-                        const activeView = document.querySelector('.view-section.active');
-                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-                    }
-                } catch (err) { showToast("Failed to parse CSV.", "error"); }
-                document.getElementById('csv-upload').value = ''; 
-            }; reader.readAsText(file);
+
+        function flashUI(elementId) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                el.classList.remove('pulse-update');
+                void el.offsetWidth;
+                el.classList.add('pulse-update');
+            }
         }
-        function exportDataJSON() {
-            const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state)); a.download = "wealth_backup.json"; document.body.appendChild(a); a.click(); a.remove();
+
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0');
+                if(id==='addTransactionModal') document.getElementById('addTxBox').classList.remove('scale-95');
+                if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.remove('scale-95');
+            }, 10);
         }
-        function importDataJSON(e) {
-            const file = e.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawData = evt.target.result.trim();
-                    if (rawData.charCodeAt(0) === 0xFEFF) rawData = rawData.slice(1);
-                    const obj = JSON.parse(rawData);
-                    if(obj.transactions) state.transactions = obj.transactions; if(obj.customPrices) state.customPrices = obj.customPrices;
-                    if(obj.history) state.history = obj.history; if(obj.targets) state.targets = obj.targets;
-                    saveData(); showToast('Backup restored successfully'); 
-                    document.getElementById('onboarding-state').classList.add('hidden');
-                    document.getElementById('view-dashboard').classList.remove('hidden');
-                    const activeView = document.querySelector('.view-section.active');
-                    if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-                } catch(err) { showToast('Invalid backup file', 'error'); }
-                document.getElementById('json-upload-backup').value = '';
-            }; reader.readAsText(file);
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if(!m) return;
+            m.classList.add('opacity-0');
+            if(id==='addTransactionModal') document.getElementById('addTxBox').classList.add('scale-95');
+            if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.add('scale-95');
+            setTimeout(() => { 
+                m.classList.add('hidden'); 
+                if(id==='addTransactionModal') {
+                    document.getElementById('txForm').reset();
+                    document.getElementById('txId').value = '';
+                    document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                }
+            }, 300);
+        }
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            const iconContainer = document.getElementById('toast-icon-container');
+            if(type === 'success') {
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                iconContainer.innerHTML = '<i data-lucide="check-circle" class="text-accent w-6 h-6"></i>';
+            } else {
+                t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-loss p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
+                iconContainer.innerHTML = '<i data-lucide="alert-circle" class="text-loss w-6 h-6"></i>';
+            }
+            lucide.createIcons();
+
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
 
         window.onload = init;
