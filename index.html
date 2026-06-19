@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Wealth Dashboard - Update 1d</title>
+    <title>Thai Wealth Dashboard - Update 1e</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -94,7 +94,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 1d Live</span>
+            <span id="last-sync" class="opacity-70">Update 1e Live</span>
         </div>
     </aside>
 
@@ -199,7 +199,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
                         <h2 class="text-xl font-semibold">Asset Holdings & Market Prices</h2>
-                        <p class="text-sm text-gray-400 mt-1">Stock prices attempt auto-update via Yahoo Finance. If failed, click "Update Price" to enter manually.</p>
+                        <p class="text-sm text-gray-400 mt-1">Stock prices are retrieved using Alpha Vantage. Ensure symbols include .BK (e.g. BDMS.BK)</p>
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
                         <button onclick="exportCSV()" class="flex-1 md:flex-none justify-center glass-panel hover:bg-gray-800 px-3 py-2 rounded text-xs flex items-center transition shadow border border-gray-700">
@@ -270,7 +270,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1d)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1e)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
@@ -335,7 +335,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Asset Symbol/Name *</label>
-                        <input type="text" id="txName" placeholder="e.g. BTC, PTT, SCB Savings" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required>
+                        <input type="text" id="txName" placeholder="e.g. BTC, PTT.BK" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -403,6 +403,10 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
+        // --- ALPHA VANTAGE API KEY ---
+        // YOU MUST REPLACE 'YOUR_API_KEY_HERE' WITH THE FREE KEY YOU GOT FROM ALPHAVANTAGE.CO
+        const ALPHA_VANTAGE_API_KEY = 'QON2ABEYVZGSZXO5';
+
         // --- SAFE STATE MANAGEMENT ---
         let state = { transactions: [], customPrices: {} };
         
@@ -413,7 +417,7 @@
                 state.transactions = Array.isArray(parsed) ? parsed : [];
             }
         } catch(e) {
-            console.warn("Update 1d Auto-Fix: Corrupted transactions memory detected and cleared.");
+            console.warn("Update 1e Auto-Fix: Corrupted transactions memory detected and cleared.");
             localStorage.removeItem('wealth_txs');
         }
 
@@ -424,7 +428,7 @@
                 state.customPrices = (typeof parsed === 'object' && parsed !== null) ? parsed : {};
             }
         } catch(e) {
-            console.warn("Update 1d Auto-Fix: Corrupted price memory detected and cleared.");
+            console.warn("Update 1e Auto-Fix: Corrupted price memory detected and cleared.");
             localStorage.removeItem('wealth_custom_prices');
         }
 
@@ -490,11 +494,11 @@
                 if(viewId === 'transactions') renderTransactions();
                 if(viewId === 'retirement') updateRetirement();
             } catch(e) {
-                console.error("View rendering error prevented in 1d:", e);
+                console.error("View rendering error prevented in 1e:", e);
             }
         }
 
-        // --- REAL-TIME DATA FETCHING ENGINE (Update 1d - Yahoo Finance Integration) ---
+        // --- REAL-TIME DATA FETCHING ENGINE (Update 1e - Alpha Vantage API) ---
         async function fetchMarketData() {
             document.getElementById('last-sync').innerText = "Syncing live data...";
             let offlineMode = false;
@@ -567,42 +571,39 @@
                 document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
             }
 
-            // 4. NEW: Fetch Thai Stocks via Yahoo Finance Proxy
+            // 4. Update 1e: Alpha Vantage API for Thai Stocks
             let setAssets = new Set();
             state.transactions.forEach(tx => {
                 if(tx.type === 'SET') setAssets.add((tx.name || "UNKNOWN").toUpperCase());
             });
 
-            for (let assetName of setAssets) {
-                try {
-                    // Ensure the ticker has .BK for Yahoo Finance
-                    let queryTicker = assetName.endsWith('.BK') ? assetName : assetName + '.BK';
-                    
-                    // We use an open, free proxy (allorigins) to bypass CORS restrictions in the browser
-                    let proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`;
-                    
-                    let res = await fetch(proxyUrl);
-                    if(res.ok) {
-                        let proxyData = await res.json();
-                        let yahooData = JSON.parse(proxyData.contents);
-                        
-                        let livePrice = yahooData.chart.result[0].meta.regularMarketPrice;
-                        if(livePrice && !isNaN(livePrice)) {
-                            // Save the price under the EXACT name the user typed so it matches later
-                            market.prices[assetName] = livePrice;
+            if (ALPHA_VANTAGE_API_KEY === 'YOUR_API_KEY_HERE' && setAssets.size > 0) {
+                console.warn("Alpha Vantage API Key is missing. Stock prices cannot be fetched automatically.");
+            } else {
+                for (let assetName of setAssets) {
+                    try {
+                        let url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${assetName}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+                        let res = await fetch(url);
+                        if(res.ok) {
+                            let data = await res.json();
+                            if(data["Global Quote"] && data["Global Quote"]["05. price"]) {
+                                let livePrice = parseFloat(data["Global Quote"]["05. price"]);
+                                if(!isNaN(livePrice)) {
+                                    market.prices[assetName] = livePrice;
+                                }
+                            }
                         }
+                    } catch(e) {
+                        console.log(`Auto-fetch failed for ${assetName}`);
                     }
-                } catch(e) {
-                    console.log(`Auto-fetch failed for ${assetName}`);
-                    // Fails silently, user can still manually update
                 }
             }
 
             if(offlineMode) {
-                document.getElementById('last-sync').innerText = `Update 1d (Offline Fallback)`;
+                document.getElementById('last-sync').innerText = `Update 1e (Offline Fallback)`;
                 showToast('Network limits reached. Using localized fallback prices.', 'error');
             } else {
-                document.getElementById('last-sync').innerText = `Update 1d - Last sync: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('last-sync').innerText = `Update 1e - Last sync: ${new Date().toLocaleTimeString()}`;
             }
             
             const activeViewEl = document.querySelector('.view-section.active');
@@ -621,7 +622,7 @@
             if (tx.type === 'Gold') {
                 return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
             }
-            // Update 1d: Check if we successfully grabbed a live Yahoo Finance price for this SET stock
+            
             if (tx.type === 'SET' && market.prices[n] > 0) {
                 return market.prices[n];
             }
@@ -798,7 +799,6 @@
                 let pnl = currentValThb - costThb;
                 let pnlPct = costThb > 0 ? (pnl / costThb) * 100 : 0;
                 
-                // Determine if this asset's price is coming from a live automatic feed
                 let isAutoAsset = (tx.type === 'Crypto' && ((tx.name||"").toUpperCase() === 'BTC')) || 
                                   tx.type === 'Gold' || 
                                   (tx.type === 'SET' && market.prices[(tx.name||"").toUpperCase()] > 0);
