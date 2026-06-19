@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.7 (Stable)</title>
+    <title>WealthOS 2.8 (Stable)</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -81,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.7 (Stable)</span>
+            <span id="last-sync" class="opacity-70">Update 2.8 (Stable)</span>
         </div>
     </aside>
 
@@ -267,8 +267,14 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Current Total Net Wealth</label>
-                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="block text-xs text-gray-400">Starting Principal (THB)</label>
+                                <button onclick="syncRetirementWealth()" class="text-[10px] text-accent hover:text-white transition flex items-center"><i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i> Use Actual Net Worth</button>
+                            </div>
+                            <div class="flex items-center bg-gray-800 border border-gray-700 rounded focus-within:border-accent overflow-hidden">
+                                <span class="px-3 text-gray-400">฿</span>
+                                <input type="number" id="ret-current-wealth" class="w-full bg-transparent p-2 text-lg font-bold font-mono text-accent outline-none" oninput="updateRetirement()">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Monthly Expenses Target (THB)</label>
@@ -283,7 +289,7 @@
                     <div class="lg:col-span-2 space-y-6">
                         <div class="glass-panel p-6 rounded-xl text-center border border-gray-800">
                             <div class="text-xs text-gray-400 uppercase tracking-wider mb-2">Your Wealth Will Last For</div>
-                            <div class="text-4xl md:text-5xl font-bold font-mono text-profit mb-2" id="ret-longevity">0 Yrs, 0 Mos</div>
+                            <div class="text-4xl md:text-5xl font-bold font-mono text-gray-500 mb-2" id="ret-longevity">0 Yrs, 0 Mos</div>
                         </div>
                         <div class="glass-panel p-5 rounded-xl h-64 border border-gray-800">
                             <canvas id="retirementChart"></canvas>
@@ -294,19 +300,19 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.7 Stable)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.8 Stable)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
                     <p class="text-xs text-gray-400">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
-                            <span class="text-sm font-medium">Copy Data String</span>
+                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Copy Data String</span>
                         </button>
                         <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
-                            <span class="text-sm font-medium">Paste Data String</span>
+                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Paste Data String</span>
                         </button>
                     </div>
                 </div>
@@ -315,14 +321,14 @@
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Local JSON Files</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
-                            <span class="text-sm font-medium">Backup (JSON File)</span>
+                            <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Backup (JSON File)</span>
                         </button>
                         <div class="relative w-full">
                             <input type="file" id="json-upload-backup" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importDataJSON(event)">
                             <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700">
-                                <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400"></i>
-                                <span class="text-sm font-medium">Restore (JSON File)</span>
+                                <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400 pointer-events-none"></i>
+                                <span class="text-sm font-medium pointer-events-none">Restore (JSON File)</span>
                             </div>
                         </div>
                     </div>
@@ -330,7 +336,7 @@
 
                 <div class="glass-panel p-6 rounded-xl border border-gray-800">
                     <button onclick="clearAllData()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
-                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Wipe All Local Data
+                        <i data-lucide="trash-2" class="w-4 h-4 mr-2 pointer-events-none"></i> Wipe All Local Data
                     </button>
                 </div>
             </section>
@@ -407,7 +413,7 @@
             <p class="text-sm text-gray-300 mb-4">Set current price for <strong id="upd-asset-name" class="text-accent">Asset</strong> to calculate Profit/Loss.</p>
             
             <a id="upd-google-link" href="#" target="_blank" class="flex items-center justify-center w-full bg-white text-black font-semibold py-3 rounded mb-4 hover:bg-gray-200 transition">
-                <i data-lucide="search" class="w-4 h-4 mr-2"></i> Search Price on Google
+                <i data-lucide="search" class="w-4 h-4 mr-2 pointer-events-none"></i> <span class="pointer-events-none">Search Price on Google</span>
             </a>
 
             <div class="mb-4">
@@ -525,12 +531,12 @@
 
         function openAddAssetModal() {
             try {
+                openModal('addTransactionModal');
                 document.getElementById('txForm').reset();
                 document.getElementById('txId').value = '';
                 document.getElementById('modal-title').innerText = 'Add Asset Transaction';
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             } catch (e) { console.warn("Form reset issue", e); }
-            openModal('addTransactionModal');
         }
 
         // --- 4. MARKET DATA (Silent Background Fetch) ---
@@ -584,7 +590,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.7 (Offline Fallback)` : `Update 2.7 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `WealthOS 2.8 (Offline Fallback)` : `WealthOS 2.8 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             try {
                 const stats = calculatePortfolio();
@@ -889,6 +895,72 @@
             saveData();
         }
 
+        // --- RETIREMENT ---
+        function syncRetirementWealth() {
+            const stats = calculatePortfolio();
+            document.getElementById('ret-current-wealth').value = Math.round(stats.totalValue);
+            updateRetirement();
+        }
+
+        function updateRetirement() {
+            let wealthInput = document.getElementById('ret-current-wealth');
+            
+            // Auto-sync on first load if it's empty
+            if (wealthInput.value === "") {
+                const stats = calculatePortfolio();
+                wealthInput.value = Math.round(stats.totalValue);
+            }
+            
+            const principal = parseFloat(wealthInput.value) || 0;
+            const monthlyDraw = parseFloat(document.getElementById('ret-monthly-usage').value) || 0;
+            const annualReturn = (parseFloat(document.getElementById('ret-return').value) || 0) / 100;
+            
+            if (principal <= 0 || monthlyDraw <= 0) {
+                document.getElementById('ret-longevity').innerText = "0 Yrs, 0 Mos";
+                document.getElementById('ret-longevity').className = "text-4xl md:text-5xl font-bold font-mono mb-2 text-gray-500";
+                if(charts.retirement) charts.retirement.destroy();
+                return;
+            }
+
+            let balance = principal;
+            let months = 0;
+            let history = [balance];
+            
+            while (balance > 0 && months < 1200) { 
+                balance = balance * (1 + (annualReturn / 12)) - monthlyDraw;
+                if (months % 12 === 0) history.push(Math.max(balance, 0));
+                months++;
+            }
+
+            if (months >= 1200) {
+                document.getElementById('ret-longevity').innerText = "Forever! 🚀";
+                document.getElementById('ret-longevity').className = "text-4xl md:text-5xl font-bold font-mono mb-2 text-profit";
+            } else {
+                let y = Math.floor(months / 12);
+                let m = months % 12;
+                document.getElementById('ret-longevity').innerText = `${y} Yrs, ${m} Mos`;
+                document.getElementById('ret-longevity').className = `text-4xl md:text-5xl font-bold font-mono mb-2 ${y > 15 ? 'text-profit' : 'text-loss'}`;
+            }
+
+            const retCtx = document.getElementById('retirementChart').getContext('2d');
+            if(charts.retirement) charts.retirement.destroy();
+            charts.retirement = new Chart(retCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: history.length}, (_, i) => `Yr ${i}`),
+                    datasets: [{
+                        label: 'Projected Wealth Balance',
+                        data: history,
+                        borderColor: '#2962FF',
+                        backgroundColor: 'rgba(41, 98, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { ticks: {color: '#6b7280'} }, y: { display: false } } }
+            });
+        }
+
         // --- SAFE FORM ACTIONS ---
         function handleTransactionSubmit(e) {
             e.preventDefault();
@@ -1008,13 +1080,6 @@
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             }
-        }
-
-        // --- BULLETPROOF UTILS ---
-        function formatNum(num, decimals = 2) {
-            // Absolute safety net against Intl.NumberFormat RangeError crashes
-            if (isNaN(num) || num === null || num === undefined) num = 0;
-            return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num);
         }
 
         function flashUI(elementId) {
