@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Wealth Dashboard - Update 1f</title>
+    <title>Thai Wealth Dashboard - Update 1g</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -94,7 +94,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 1f Live</span>
+            <span id="last-sync" class="opacity-70">Update 1g Live</span>
         </div>
     </aside>
 
@@ -199,7 +199,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
                         <h2 class="text-xl font-semibold">Asset Holdings & Market Prices</h2>
-                        <p class="text-sm text-gray-400 mt-1">Stock prices automatically update via Alpha Vantage API.</p>
+                        <p class="text-sm text-gray-400 mt-1">Stock prices attempt auto-update via Yahoo Finance API Proxies.</p>
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
                         <button onclick="exportCSV()" class="flex-1 md:flex-none justify-center glass-panel hover:bg-gray-800 px-3 py-2 rounded text-xs flex items-center transition shadow border border-gray-700">
@@ -270,7 +270,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1f)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1g)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
@@ -413,7 +413,7 @@
                 state.transactions = Array.isArray(parsed) ? parsed : [];
             }
         } catch(e) {
-            console.warn("Update 1f Auto-Fix: Corrupted transactions memory detected and cleared.");
+            console.warn("Update 1g Auto-Fix: Corrupted transactions memory detected and cleared.");
             localStorage.removeItem('wealth_txs');
         }
 
@@ -424,7 +424,7 @@
                 state.customPrices = (typeof parsed === 'object' && parsed !== null) ? parsed : {};
             }
         } catch(e) {
-            console.warn("Update 1f Auto-Fix: Corrupted price memory detected and cleared.");
+            console.warn("Update 1g Auto-Fix: Corrupted price memory detected and cleared.");
             localStorage.removeItem('wealth_custom_prices');
         }
 
@@ -490,11 +490,11 @@
                 if(viewId === 'transactions') renderTransactions();
                 if(viewId === 'retirement') updateRetirement();
             } catch(e) {
-                console.error("View rendering error prevented in 1f:", e);
+                console.error("View rendering error prevented in 1g:", e);
             }
         }
 
-        // --- REAL-TIME DATA FETCHING ENGINE (Update 1f - Alpha Vantage) ---
+        // --- REAL-TIME DATA FETCHING ENGINE (Update 1g - Multi-Proxy Yahoo Finance) ---
         async function fetchMarketData() {
             document.getElementById('last-sync').innerText = "Syncing live data...";
             let offlineMode = false;
@@ -567,55 +567,55 @@
                 document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
             }
 
-            // 4. ALPHA VANTAGE INTEGRATION FOR THAI STOCKS
+            // 4. MULTI-PROXY YAHOO FINANCE FOR THAI STOCKS (UPDATE 1g)
             let setAssets = new Set();
             state.transactions.forEach(tx => {
                 if(tx.type === 'SET') {
-                    let sym = (tx.name || "").toUpperCase().trim();
+                    // Extract base ticker (e.g. BDMS) regardless of how user typed it
+                    let sym = (tx.name || "").toUpperCase().trim().replace('.BK', '');
                     if (sym) setAssets.add(sym);
                 }
             });
 
             if (setAssets.size > 0) {
-                const ALPHA_VANTAGE_API_KEY = 'QON2ABEYVZGSZXO5';
-                
                 for (let baseName of setAssets) {
-                    try {
-                        let queryTicker = baseName.endsWith('.BK') ? baseName : baseName + '.BK';
-                        let url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${queryTicker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-                        
-                        let res = await fetch(url);
-                        if(res.ok) {
-                            let data = await res.json();
-                            
-                            // Check for successful price return
-                            if(data['Global Quote'] && data['Global Quote']['05. price']) {
-                                let livePrice = parseFloat(data['Global Quote']['05. price']);
-                                if(!isNaN(livePrice)) {
-                                    market.prices[baseName] = livePrice;
-                                    console.log(`Successfully fetched ${queryTicker}: ฿${livePrice}`);
-                                }
-                            } 
-                            // Check if API limit was hit
-                            else if (data.Information && data.Information.includes("rate limit")) {
-                                showToast("Alpha Vantage free API limit reached (25/day).", "error");
-                                break; // Stop checking other stocks if limit is already hit
-                            }
-                        }
-                    } catch(e) {
-                        console.log(`Alpha Vantage fetch failed for ${baseName}`);
-                    }
+                    let ticker = baseName + '.BK';
+                    let price = null;
                     
-                    // Delay 1.5 seconds between requests to avoid hitting the "5 requests per minute" limit
-                    await new Promise(r => setTimeout(r, 1500));
+                    // Fallback system: If one public developer proxy is blocked, try the other
+                    const proxyUrls = [
+                        `https://api.allorigins.win/raw?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + ticker)}`,
+                        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker)}`
+                    ];
+
+                    for (let pUrl of proxyUrls) {
+                        try {
+                            let res = await fetch(pUrl, { cache: 'no-store' });
+                            if (res.ok) {
+                                let data = await res.json();
+                                if (data.chart && data.chart.result && data.chart.result.length > 0) {
+                                    price = data.chart.result[0].meta.regularMarketPrice;
+                                    break; // Success! Stop trying other proxies for this stock
+                                }
+                            }
+                        } catch(e) {
+                            // Proxy failed, loop to the next one
+                        }
+                    }
+
+                    // Save the price under the base name
+                    if (price !== null && !isNaN(price)) {
+                        market.prices[baseName] = price;
+                        console.log(`Successfully fetched ${ticker}: ฿${price}`);
+                    }
                 }
             }
 
             if(offlineMode) {
-                document.getElementById('last-sync').innerText = `Update 1f (Offline Fallback)`;
+                document.getElementById('last-sync').innerText = `Update 1g (Offline Fallback)`;
                 showToast('Network limits reached. Using localized fallback prices.', 'error');
             } else {
-                document.getElementById('last-sync').innerText = `Update 1f - Last sync: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('last-sync').innerText = `Update 1g - Last sync: ${new Date().toLocaleTimeString()}`;
             }
             
             const activeViewEl = document.querySelector('.view-section.active');
@@ -626,7 +626,7 @@
 
         // --- VALUATION ENGINE ---
         function getAssetMarketPrice(tx) {
-            let n = (tx.name || "UNKNOWN").toUpperCase();
+            let n = (tx.name || "UNKNOWN").toUpperCase().replace('.BK', '');
             
             if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN')) {
                 return market.prices['BTC'] > 0 ? market.prices['BTC'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
@@ -635,14 +635,14 @@
                 return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
             }
             
-            // Check Alpha Vantage prices (checking both with and without .BK just in case)
-            if (tx.type === 'SET') {
-                if (market.prices[n] > 0) return market.prices[n];
-                if (market.prices[n + '.BK'] > 0) return market.prices[n + '.BK'];
+            // Check if Yahoo fetcher succeeded for this Thai Stock
+            if (tx.type === 'SET' && market.prices[n] > 0) {
+                return market.prices[n];
             }
             
-            if (state.customPrices[n]) {
-                return state.customPrices[n];
+            // Fallback to manually entered custom price
+            if (state.customPrices[n] || state.customPrices[n + '.BK']) {
+                return state.customPrices[n] || state.customPrices[n + '.BK'];
             }
             
             return (parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1);
@@ -813,16 +813,16 @@
                 let pnl = currentValThb - costThb;
                 let pnlPct = costThb > 0 ? (pnl / costThb) * 100 : 0;
                 
-                let txNameUpper = (tx.name||"").toUpperCase();
+                let txNameUpper = (tx.name||"").toUpperCase().replace('.BK', '');
                 let isAutoAsset = (tx.type === 'Crypto' && (txNameUpper === 'BTC')) || 
                                   tx.type === 'Gold' || 
-                                  (tx.type === 'SET' && (market.prices[txNameUpper] > 0 || market.prices[txNameUpper + '.BK'] > 0));
+                                  (tx.type === 'SET' && (market.prices[txNameUpper] > 0));
 
                 let row = `
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
                         <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
                         <td class="p-4">
-                            <div class="font-bold text-gray-200">${txNameUpper}</div>
+                            <div class="font-bold text-gray-200">${(tx.name || "UNKNOWN").toUpperCase()}</div>
                             <div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div>
                         </td>
                         <td class="p-4 text-right">${formatNum(parseFloat(tx.qty)||0, 4)}</td>
@@ -897,92 +897,6 @@
             } else {
                 showToast('Invalid price entered', 'error');
             }
-        }
-
-        // --- CSV EXPORT AND IMPORT ---
-        function exportCSV() {
-            if(state.transactions.length === 0) {
-                showToast("No transactions to export", "error");
-                return;
-            }
-            
-            let csv = "Date,Type,Name,Qty,Price,Currency\n";
-            state.transactions.forEach(t => {
-                csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'wealth_transactions.csv');
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showToast("CSV Exported Successfully");
-        }
-
-        function importCSV(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    let rawText = evt.target.result;
-                    
-                    if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
-                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead.");
-                        document.getElementById('csv-upload').value = ''; 
-                        return;
-                    }
-
-                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-                    
-                    if (lines.length <= 1) {
-                        showToast("No transaction rows found.", "error");
-                        return;
-                    }
-
-                    let importedCount = 0;
-                    let parsedTransactions = [];
-
-                    for (let i = 1; i < lines.length; i++) {
-                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
-                        
-                        if (row.length >= 6) {
-                            parsedTransactions.push({
-                                id: 'import_' + Date.now() + i,
-                                date: new Date(row[0]).toISOString().split('T')[0],
-                                type: row[1],
-                                name: row[2].toUpperCase(),
-                                qty: parseFloat(row[3]),
-                                price: parseFloat(row[4]),
-                                currency: row[5].toUpperCase()
-                            });
-                            importedCount++;
-                        }
-                    }
-
-                    if (parsedTransactions.length > 0) {
-                        state.transactions = [...state.transactions, ...parsedTransactions];
-                        localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
-                        
-                        const activeView = document.querySelector('.view-section.active');
-                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-                        
-                        showToast(`${importedCount} transactions imported!`);
-                    } else {
-                        showToast("No valid rows found to import.", "error");
-                    }
-                } catch (err) { 
-                    showToast("Failed to parse CSV. Check format.", "error"); 
-                }
-                document.getElementById('csv-upload').value = ''; 
-            };
-            reader.readAsText(file);
         }
 
         // --- CHARTS ---
