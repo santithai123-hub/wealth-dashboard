@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thai Wealth Dashboard - Update 1b</title>
+    <title>Thai Wealth Dashboard - Update 1c</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -94,7 +94,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 1b Live</span>
+            <span id="last-sync" class="opacity-70">Update 1c Live</span>
         </div>
     </aside>
 
@@ -199,7 +199,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
                         <h2 class="text-xl font-semibold">Asset Holdings & Market Prices</h2>
-                        <p class="text-sm text-gray-400 mt-1">Click "Update Price" to check Google and manually update PnL.</p>
+                        <p class="text-sm text-gray-400 mt-1">Add .BK to Thai stocks (e.g. BDMS.BK) for auto-updates. Click "Refresh" to pull live prices.</p>
                     </div>
                     <div class="flex space-x-2 w-full md:w-auto">
                         <button onclick="exportCSV()" class="flex-1 md:flex-none justify-center glass-panel hover:bg-gray-800 px-3 py-2 rounded text-xs flex items-center transition shadow border border-gray-700">
@@ -270,7 +270,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1b)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Update 1c)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Files (Desktop)</h3>
@@ -335,7 +335,8 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Asset Symbol/Name *</label>
-                        <input type="text" id="txName" placeholder="e.g. BTC, PTT, SCB Savings" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required>
+                        <input type="text" id="txName" placeholder="e.g. BTC, BDMS.BK, SCB Savings" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required>
+                        <p class="text-[10px] text-gray-500 mt-1">For Thai Stocks, add .BK at the end (e.g. BDMS.BK) for auto-pricing.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -403,7 +404,7 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
-        // --- SAFE STATE MANAGEMENT (Self-Healing memory scanner) ---
+        // --- SAFE STATE MANAGEMENT ---
         let state = { transactions: [], customPrices: {} };
         
         try {
@@ -413,7 +414,7 @@
                 state.transactions = Array.isArray(parsed) ? parsed : [];
             }
         } catch(e) {
-            console.warn("Update 1b Auto-Fix: Corrupted transactions memory detected and cleared.");
+            console.warn("Corrupted transactions memory detected and cleared.");
             localStorage.removeItem('wealth_txs');
         }
 
@@ -424,12 +425,14 @@
                 state.customPrices = (typeof parsed === 'object' && parsed !== null) ? parsed : {};
             }
         } catch(e) {
-            console.warn("Update 1b Auto-Fix: Corrupted price memory detected and cleared.");
+            console.warn("Corrupted price memory detected and cleared.");
             localStorage.removeItem('wealth_custom_prices');
         }
 
+        // Live Market Prices Store
         let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
         let charts = { allocation: null, performance: null, retirement: null };
+        let activeSetStocks = new Set(); // To track which stocks to fetch
 
         function init() {
             lucide.createIcons();
@@ -437,7 +440,7 @@
             nav('dashboard'); 
         }
 
-        // --- EXPLICIT SAFE MODAL LAUNCHER (NEW in 1b) ---
+        // --- EXPLICIT SAFE MODAL LAUNCHER ---
         function openAddAssetModal() {
             try {
                 document.getElementById('txForm').reset();
@@ -447,7 +450,6 @@
                 if(dateInput) dateInput.valueAsDate = new Date();
                 openModal('addTransactionModal');
             } catch(e) {
-                console.error("Failed to cleanly open modal:", e);
                 openModal('addTransactionModal'); // Fallback
             }
         }
@@ -492,15 +494,16 @@
                 if(viewId === 'transactions') renderTransactions();
                 if(viewId === 'retirement') updateRetirement();
             } catch(e) {
-                console.error("View rendering error prevented in 1b:", e);
+                console.error("View rendering error prevented:", e);
             }
         }
 
-        // --- REAL-TIME DATA FETCHING ENGINE ---
+        // --- REAL-TIME DATA FETCHING ENGINE (UPGRADED for SET) ---
         async function fetchMarketData() {
             document.getElementById('last-sync').innerText = "Syncing live data...";
             let offlineMode = false;
             
+            // 1. Fetch Exchange Rate
             try {
                 let erRes = await fetch('https://open.er-api.com/v6/latest/USD');
                 if(!erRes.ok) throw new Error("ER-API Not OK");
@@ -510,6 +513,7 @@
                 flashUI('ui-usd-thb');
             } catch(e) { offlineMode = true; document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2); }
 
+            // 2. Fetch BTC
             try {
                 let btcUsd = null;
                 try {
@@ -523,9 +527,7 @@
                     let d3 = await r3.json();
                     btcUsd = d3.bitcoin.usd;
                 }
-                
                 if (btcUsd === null || isNaN(btcUsd)) throw new Error();
-
                 market.prices['BTC'] = btcUsd * market.usd_thb;
                 document.getElementById('ticker-btc-usd').innerText = `$${formatNum(btcUsd, 0)}`;
                 flashUI('ui-btc-usd');
@@ -536,6 +538,7 @@
                 document.getElementById('ticker-btc-usd').innerText = `$${formatNum(fallbackBtcUsd, 0)}`;
             }
 
+            // 3. Fetch Gold
             try {
                 let spotUsd = null;
                 try {
@@ -549,9 +552,7 @@
                     let d3 = await r3.json();
                     spotUsd = d3['pax-gold'].usd;
                 }
-                
                 if (spotUsd === null || isNaN(spotUsd)) throw new Error();
-
                 let goldThb = (spotUsd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
                 let roundedGold = Math.round(goldThb / 50) * 50;
                 market.prices['GOLD'] = roundedGold;
@@ -566,11 +567,44 @@
                 document.getElementById('ticker-gold').innerText = `฿${formatNum(roundedGold, 0)}`;
             }
 
+            // 4. Fetch Thai Stocks (SET) that end in .BK via Yahoo Finance public query bridge
+            activeSetStocks.clear();
+            state.transactions.forEach(tx => {
+                if (tx.type === 'SET' && tx.name.toUpperCase().endsWith('.BK')) {
+                    activeSetStocks.add(tx.name.toUpperCase());
+                }
+            });
+
+            if (activeSetStocks.size > 0) {
+                try {
+                    const symbols = Array.from(activeSetStocks).join(',');
+                    // Using a public CORS proxy to access Yahoo Finance quote API
+                    const yfUrl = `https://corsproxy.io/?https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`;
+                    
+                    let yfRes = await fetch(yfUrl);
+                    if (yfRes.ok) {
+                        let yfData = await yfRes.json();
+                        if (yfData.quoteResponse && yfData.quoteResponse.result) {
+                            yfData.quoteResponse.result.forEach(stock => {
+                                if (stock.symbol && stock.regularMarketPrice) {
+                                    market.prices[stock.symbol.toUpperCase()] = stock.regularMarketPrice;
+                                    // Save it to custom prices cache so it persists between reloads
+                                    state.customPrices[stock.symbol.toUpperCase()] = stock.regularMarketPrice;
+                                }
+                            });
+                            localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
+                        }
+                    }
+                } catch (error) {
+                    console.warn("Could not fetch Thai stock prices automatically. Free API limits may apply.", error);
+                }
+            }
+
             if(offlineMode) {
-                document.getElementById('last-sync').innerText = `Update 1b (Offline Fallback)`;
+                document.getElementById('last-sync').innerText = `Update 1c (Offline Fallback)`;
                 showToast('Network limits reached. Using localized fallback prices.', 'error');
             } else {
-                document.getElementById('last-sync').innerText = `Update 1b - Last sync: ${new Date().toLocaleTimeString()}`;
+                document.getElementById('last-sync').innerText = `Update 1c - Last sync: ${new Date().toLocaleTimeString()}`;
             }
             
             const activeViewEl = document.querySelector('.view-section.active');
@@ -590,6 +624,12 @@
                 return market.prices['GOLD'] > 0 ? market.prices['GOLD'] : ((parseFloat(tx.price)||0) * (tx.currency === 'USD' ? market.usd_thb : 1));
             }
             
+            // Check Live Market cache first (for Thai Stocks)
+            if (market.prices[n] > 0) {
+                return market.prices[n];
+            }
+
+            // Fallback to custom saved prices
             if (state.customPrices[n]) {
                 return state.customPrices[n];
             }
@@ -672,7 +712,6 @@
                 b.classList.add('text-gray-400');
             });
             
-            // Re-highlight the correct button using data-type logic
             let activeBtn = btnObj || document.querySelector(`.port-tab-btn[data-type="${filterType}"]`);
             if(activeBtn) {
                 activeBtn.classList.add('tab-active');
@@ -763,21 +802,23 @@
                 let pnl = currentValThb - costThb;
                 let pnlPct = costThb > 0 ? (pnl / costThb) * 100 : 0;
                 
-                let isAutoAsset = (tx.type === 'Crypto' && ((tx.name||"").toUpperCase() === 'BTC')) || tx.type === 'Gold';
+                let txName = (tx.name || "UNKNOWN").toUpperCase();
+                let isAutoAsset = (tx.type === 'Crypto' && (txName === 'BTC')) || tx.type === 'Gold';
+                let isLiveThaiStock = tx.type === 'SET' && txName.endsWith('.BK') && market.prices[txName] > 0;
 
                 let row = `
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
                         <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
                         <td class="p-4">
-                            <div class="font-bold text-gray-200">${(tx.name || "UNKNOWN").toUpperCase()}</div>
+                            <div class="font-bold text-gray-200">${txName}</div>
                             <div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div>
                         </td>
                         <td class="p-4 text-right">${formatNum(parseFloat(tx.qty)||0, 4)}</td>
                         <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (parseFloat(tx.qty) || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
-                            ${!isAutoAsset ? `
-                                <button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent" title="Manual Update">
+                            ${!(isAutoAsset || isLiveThaiStock) ? `
+                                <button onclick="openUpdatePrice('${txName}')" class="ml-2 text-gray-500 hover:text-accent" title="Manual Update">
                                     <i data-lucide="refresh-cw" class="w-3 h-3 inline"></i>
                                 </button>
                             ` : `<span class="ml-2 text-accent text-[10px]" title="Auto-updated API">Live</span>`}
@@ -858,7 +899,6 @@
                         labels: Object.keys(stats.assetMap),
                         datasets: [{
                             data: Object.values(stats.assetMap),
-                            // Extended palette to 10 colors to prevent charting crashes with many unique classes
                             backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4', '#14B8A6', '#F97316'],
                             borderWidth: 0,
                             hoverOffset: 4
@@ -961,7 +1001,6 @@
         function handleTransactionSubmit(e) {
             e.preventDefault();
             
-            // Highly robust extraction to prevent NaN crashes
             const txIdInput = document.getElementById('txId').value;
             const id = txIdInput || Date.now().toString();
             
@@ -993,9 +1032,7 @@
             
             closeModal('addTransactionModal');
             showToast('Asset transaction saved successfully');
-            
-            const activeView = document.querySelector('.view-section.active');
-            if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+            fetchMarketData(); // Auto-refresh to fetch newly added stock price
         }
 
         function deleteTx(id) {
@@ -1108,6 +1145,73 @@
             }
         }
 
+        // --- CSV EXPORT AND IMPORT ---
+        function exportCSV() {
+            if(state.transactions.length === 0) {
+                showToast("No transactions to export", "error");
+                return;
+            }
+            let csv = "Date,Type,Name,Qty,Price,Currency\n";
+            state.transactions.forEach(t => {
+                csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'wealth_transactions.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast("CSV Exported Successfully");
+        }
+
+        function importCSV(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    let rawText = evt.target.result;
+                    if(rawText.includes("MSMAMARPCRYPT") || rawText.includes("AES/CBC")) {
+                        alert("FILE ERROR: Your messaging app encrypted this file. \n\nPlease use the 'Copy/Paste Data String' buttons instead.");
+                        document.getElementById('csv-upload').value = ''; 
+                        return;
+                    }
+                    rawText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+                    const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                    if (lines.length <= 1) { showToast("No transaction rows found.", "error"); return; }
+                    let importedCount = 0;
+                    let parsedTransactions = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
+                        if (row.length >= 6) {
+                            parsedTransactions.push({
+                                id: 'import_' + Date.now() + i,
+                                date: new Date(row[0]).toISOString().split('T')[0],
+                                type: row[1],
+                                name: row[2].toUpperCase(),
+                                qty: parseFloat(row[3]),
+                                price: parseFloat(row[4]),
+                                currency: row[5].toUpperCase()
+                            });
+                            importedCount++;
+                        }
+                    }
+                    if (parsedTransactions.length > 0) {
+                        state.transactions = [...state.transactions, ...parsedTransactions];
+                        localStorage.setItem('wealth_txs', JSON.stringify(state.transactions));
+                        const activeView = document.querySelector('.view-section.active');
+                        if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
+                        showToast(`${importedCount} transactions imported!`);
+                    } else { showToast("No valid rows found to import.", "error"); }
+                } catch (err) { showToast("Failed to parse CSV.", "error"); }
+                document.getElementById('csv-upload').value = ''; 
+            };
+            reader.readAsText(file);
+        }
+
         // --- UTILS & TOASTS ---
         function formatNum(num, decimals = 2) {
             return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num);
@@ -1139,15 +1243,12 @@
             m.classList.add('opacity-0');
             if(id==='addTransactionModal') document.getElementById('addTxBox').classList.add('scale-95');
             if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.add('scale-95');
-            setTimeout(() => { 
-                m.classList.add('hidden'); 
-            }, 300);
+            setTimeout(() => { m.classList.add('hidden'); }, 300);
         }
 
         function showToast(msg, type='success') {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            
             const iconContainer = document.getElementById('toast-icon-container');
             if(type === 'success') {
                 t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
@@ -1157,7 +1258,6 @@
                 iconContainer.innerHTML = '<i data-lucide="alert-circle" class="text-loss w-6 h-6"></i>';
             }
             lucide.createIcons();
-
             t.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
