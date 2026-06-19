@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.7 (Stable)</title>
+    <title>WealthOS 3.0 (Stable)</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -81,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.7 (Stable)</span>
+            <span id="last-sync" class="opacity-70">Update 3.0 (Stable)</span>
         </div>
     </aside>
 
@@ -125,7 +125,7 @@
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
                 <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
-                <h2 class="text-3xl font-bold">Welcome to WealthOS!</h2>
+                <h2 class="text-3xl font-bold">Welcome to WealthOS 3.0!</h2>
                 <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
@@ -213,6 +213,7 @@
                         </thead>
                         <tbody id="transactions-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
                     </table>
+                    <!-- 100% Guaranteed Empty State Div -->
                     <div id="tx-empty-state" class="text-center py-12 text-gray-500 hidden">
                         <i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-3 opacity-50"></i>
                         No transactions found. Add an asset to get started.
@@ -266,13 +267,17 @@
             <!-- VIEW: RETIREMENT -->
             <section id="view-retirement" class="view-section space-y-6">
                 <h2 class="text-2xl font-semibold mb-2">Retirement Depletion Calculator</h2>
-                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses.</p>
+                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses. You can type a custom amount to test "What-If" scenarios.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Current Total Net Wealth</label>
-                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs text-gray-400">Current Net Wealth (THB)</label>
+                                <button onclick="resetRetirementWealth()" class="text-xs text-accent hover:text-white transition px-2 py-1 bg-gray-800 rounded">Auto-Sync</button>
+                            </div>
+                            <!-- Editable Auto-Sync Input -->
+                            <input type="number" id="ret-current-wealth" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-xl font-mono focus:border-accent outline-none text-accent font-bold" oninput="updateRetirement(true)">
                         </div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Monthly Expenses Target (THB)</label>
@@ -298,19 +303,19 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.7 Stable)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Version 3.0)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
                     <p class="text-xs text-gray-400">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
-                            <span class="text-sm font-medium">Copy Data String</span>
+                            <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Copy Data String</span>
                         </button>
                         <button onclick="pasteDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400"></i>
-                            <span class="text-sm font-medium">Paste Data String</span>
+                            <i data-lucide="clipboard-paste" class="w-6 h-6 mb-2 text-orange-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Paste Data String</span>
                         </button>
                     </div>
                 </div>
@@ -319,14 +324,14 @@
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Local JSON Files</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
-                            <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
-                            <span class="text-sm font-medium">Backup (JSON File)</span>
+                            <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400 pointer-events-none"></i>
+                            <span class="text-sm font-medium pointer-events-none">Backup (JSON File)</span>
                         </button>
                         <div class="relative w-full">
                             <input type="file" id="json-upload-backup" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importDataJSON(event)">
                             <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700">
-                                <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400"></i>
-                                <span class="text-sm font-medium">Restore (JSON File)</span>
+                                <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400 pointer-events-none"></i>
+                                <span class="text-sm font-medium pointer-events-none">Restore (JSON File)</span>
                             </div>
                         </div>
                     </div>
@@ -334,7 +339,7 @@
 
                 <div class="glass-panel p-6 rounded-xl border border-gray-800">
                     <button onclick="clearAllData()" class="w-full bg-red-900/30 text-red-500 hover:bg-red-900/50 p-3 rounded text-sm font-medium transition flex items-center justify-center border border-red-900/50">
-                        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i> Wipe All Local Data
+                        <i data-lucide="trash-2" class="w-4 h-4 mr-2 pointer-events-none"></i> <span class="pointer-events-none">Wipe All Local Data</span>
                     </button>
                 </div>
             </section>
@@ -435,7 +440,6 @@
 
     <!-- MAIN JAVASCRIPT -->
     <script>
-        // --- 1. PWA INJECTION ---
         function initPWA() {
             try {
                 const manifest = {
@@ -452,11 +456,11 @@
             } catch (e) { console.error("PWA Init Error", e); }
         }
 
-        // --- 2. STATE & SAFE LOCAL STORAGE ---
         let state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
         let market = { usd_thb: 36.00, prices: { 'BTC': 0, 'GOLD': 0 } };
         let charts = { allocation: null, history: null, retirement: null };
         let txSort = { col: 'date', asc: false };
+        let isManualRetirement = false;
 
         function loadData() {
             try {
@@ -484,27 +488,32 @@
             nav('dashboard'); 
             
             if(state.transactions.length === 0) {
-                document.getElementById('onboarding-state').classList.remove('hidden');
-                document.getElementById('view-dashboard').classList.add('hidden');
+                const obs = document.getElementById('onboarding-state');
+                const vds = document.getElementById('view-dashboard');
+                if(obs) obs.classList.remove('hidden');
+                if(vds) vds.classList.add('hidden');
             } else {
-                document.getElementById('onboarding-state').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
+                const obs = document.getElementById('onboarding-state');
+                const vds = document.getElementById('view-dashboard');
+                if(obs) obs.classList.add('hidden');
+                if(vds) vds.classList.remove('hidden');
             }
 
             fetchMarketData(); 
         }
 
-        // --- 3. NAVIGATION & MODALS ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            if(sidebar) sidebar.classList.toggle('-translate-x-full');
+            if(overlay) overlay.classList.toggle('hidden');
         }
         function toggleSidebarIfMobile() { if (window.innerWidth < 768) toggleSidebar(); }
 
         function nav(viewId) {
-            document.getElementById('onboarding-state').classList.add('hidden'); 
+            const obs = document.getElementById('onboarding-state');
+            if(obs) obs.classList.add('hidden'); 
+            
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('bg-gray-800', 'text-white'));
             
@@ -520,7 +529,10 @@
         function renderCurrentView(viewId) {
             try {
                 if(viewId === 'dashboard') renderDashboard();
-                if(viewId === 'portfolio') switchPortTab(document.querySelector('.port-tab-btn.tab-active')?.getAttribute('data-type') || 'All');
+                if(viewId === 'portfolio') {
+                    let activeBtn = document.querySelector('.port-tab-btn.tab-active');
+                    switchPortTab(activeBtn ? activeBtn.getAttribute('data-type') : 'All');
+                }
                 if(viewId === 'transactions') renderTransactions();
                 if(viewId === 'rebalance') renderRebalance();
                 if(viewId === 'retirement') updateRetirement();
@@ -529,32 +541,42 @@
 
         function openAddAssetModal() {
             try {
-                document.getElementById('txForm').reset();
-                document.getElementById('txId').value = '';
-                document.getElementById('modal-title').innerText = 'Add Asset Transaction';
-                document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+                const form = document.getElementById('txForm');
+                if(form) form.reset();
+                const idEl = document.getElementById('txId');
+                if(idEl) idEl.value = '';
+                const titleEl = document.getElementById('modal-title');
+                if(titleEl) titleEl.innerText = 'Add Asset Transaction';
+                const dateEl = document.getElementById('txDate');
+                if(dateEl) dateEl.value = new Date().toISOString().split('T')[0];
             } catch (e) { console.warn("Form reset issue", e); }
             openModal('addTransactionModal');
         }
 
-        // --- 4. MARKET DATA (Silent Background Fetch) ---
         async function fetchMarketData() {
-            document.getElementById('last-sync').innerText = "Syncing live data...";
+            const ls = document.getElementById('last-sync');
+            if(ls) ls.innerText = "Syncing live data...";
             let offlineMode = false;
             
             try {
                 let erRes = await fetch('https://open.er-api.com/v6/latest/USD');
                 let erData = await erRes.json();
                 market.usd_thb = erData.rates.THB || 36.00;
-                document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2);
+                const tu = document.getElementById('ticker-usd-thb');
+                if(tu) tu.innerText = market.usd_thb.toFixed(2);
                 flashUI('ui-usd-thb');
-            } catch(e) { offlineMode = true; document.getElementById('ticker-usd-thb').innerText = market.usd_thb.toFixed(2); }
+            } catch(e) { 
+                offlineMode = true; 
+                const tu = document.getElementById('ticker-usd-thb');
+                if(tu) tu.innerText = market.usd_thb.toFixed(2); 
+            }
 
             try {
                 let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
                 let d3 = await r3.json();
                 market.prices['BTC'] = (d3.bitcoin.usd * market.usd_thb) || 0;
-                document.getElementById('ticker-btc-usd').innerText = `$${formatNum(d3.bitcoin.usd, 0)}`;
+                const tb = document.getElementById('ticker-btc-usd');
+                if(tb) tb.innerText = `$${formatNum(d3.bitcoin.usd, 0)}`;
                 flashUI('ui-btc-usd');
             } catch(e) { offlineMode = true; market.prices['BTC'] = 65000 * market.usd_thb; }
 
@@ -563,7 +585,8 @@
                 let d3 = await r3.json();
                 let goldThb = (d3['pax-gold'].usd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
                 market.prices['GOLD'] = Math.round(goldThb / 50) * 50 || 0;
-                document.getElementById('ticker-gold').innerText = `฿${formatNum(market.prices['GOLD'], 0)}`;
+                const tg = document.getElementById('ticker-gold');
+                if(tg) tg.innerText = `฿${formatNum(market.prices['GOLD'], 0)}`;
                 flashUI('ui-gold');
             } catch(e) { offlineMode = true; market.prices['GOLD'] = 40000; }
 
@@ -588,7 +611,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.7 (Offline Fallback)` : `Update 2.7 - Last sync: ${new Date().toLocaleTimeString()}`;
+            if(ls) ls.innerText = offlineMode ? `Update 3.0 (Offline Fallback)` : `Update 3.0 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             try {
                 const stats = calculatePortfolio();
@@ -609,7 +632,6 @@
             saveData();
         }
 
-        // --- 5. SAFE VALUATION ENGINE ---
         function getAssetMarketPrice(tx) {
             let n = (tx.name || "UNKNOWN").toUpperCase();
             if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN') && market.prices['BTC'] > 0) return market.prices['BTC'];
@@ -658,59 +680,76 @@
             return { totalCost, totalValue, totalDividends, assetMap, topAsset };
         }
 
-        // --- 6. RENDERING LOGIC ---
         function renderDashboard() {
             if(state.transactions.length === 0) return;
-            document.getElementById('onboarding-state').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
+            const obs = document.getElementById('onboarding-state');
+            const vds = document.getElementById('view-dashboard');
+            if(obs) obs.classList.add('hidden');
+            if(vds) vds.classList.remove('hidden');
 
             const stats = calculatePortfolio();
             const totalReturn = stats.totalValue - stats.totalCost + stats.totalDividends;
             const returnPct = stats.totalCost > 0 ? (totalReturn / stats.totalCost) * 100 : 0;
 
-            document.getElementById('dash-total-value').innerText = `฿${formatNum(stats.totalValue, 2)}`;
-            document.getElementById('dash-total-cost').innerText = `฿${formatNum(stats.totalCost, 2)}`;
+            const tv = document.getElementById('dash-total-value');
+            if(tv) tv.innerText = `฿${formatNum(stats.totalValue, 2)}`;
+            
+            const tc = document.getElementById('dash-total-cost');
+            if(tc) tc.innerText = `฿${formatNum(stats.totalCost, 2)}`;
             
             const plEl = document.getElementById('dash-total-pl');
-            plEl.innerText = `${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}`;
-            plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
+            if(plEl) {
+                plEl.innerText = `${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}`;
+                plEl.className = `text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
+            }
             
             const plPctEl = document.getElementById('dash-total-pl-pct');
-            plPctEl.innerText = `${totalReturn >= 0 ? '+' : ''}${formatNum(returnPct, 2)}%`;
-            plPctEl.className = `text-sm font-mono font-medium mt-auto ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
+            if(plPctEl) {
+                plPctEl.innerText = `${totalReturn >= 0 ? '+' : ''}${formatNum(returnPct, 2)}%`;
+                plPctEl.className = `text-sm font-mono font-medium mt-auto ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}`;
+            }
 
-            document.getElementById('dash-top-asset').innerText = stats.topAsset;
-            document.getElementById('dash-asset-count').innerText = new Set(state.transactions.map(t => (t.name || "").toUpperCase())).size;
+            const ta = document.getElementById('dash-top-asset');
+            if(ta) ta.innerText = stats.topAsset;
+            
+            const ac = document.getElementById('dash-asset-count');
+            if(ac) ac.innerText = new Set(state.transactions.map(t => (t.name || "").toUpperCase())).size;
             
             try { renderCharts(stats); } catch(e) { console.error("Chart Error", e); }
         }
 
         function renderCharts(stats) {
-            const allocCtx = document.getElementById('allocationChart').getContext('2d');
-            if(charts.allocation) charts.allocation.destroy();
-            if(Object.keys(stats.assetMap).length > 0) {
-                charts.allocation = new Chart(allocCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(stats.assetMap),
-                        datasets: [{ data: Object.values(stats.assetMap), backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4'], borderWidth: 0, hoverOffset: 4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } } }
-                });
+            const allocCtxEl = document.getElementById('allocationChart');
+            if(allocCtxEl) {
+                const allocCtx = allocCtxEl.getContext('2d');
+                if(charts.allocation) charts.allocation.destroy();
+                if(Object.keys(stats.assetMap).length > 0) {
+                    charts.allocation = new Chart(allocCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(stats.assetMap),
+                            datasets: [{ data: Object.values(stats.assetMap), backgroundColor: ['#2962FF', '#F7931A', '#10B981', '#8B5CF6', '#FBBF24', '#EC4899', '#EF4444', '#06B6D4'], borderWidth: 0, hoverOffset: 4 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } } }
+                    });
+                }
             }
 
-            const histCtx = document.getElementById('historyChart').getContext('2d');
-            if(charts.history) charts.history.destroy();
-            let labels = state.history.map(h => new Date(h.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}));
-            let data = state.history.map(h => h.value);
-            if(labels.length === 1) { labels.unshift('Start'); data.unshift(0); }
+            const histCtxEl = document.getElementById('historyChart');
+            if(histCtxEl) {
+                const histCtx = histCtxEl.getContext('2d');
+                if(charts.history) charts.history.destroy();
+                let labels = state.history.map(h => new Date(h.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}));
+                let data = state.history.map(h => h.value);
+                if(labels.length === 1) { labels.unshift('Start'); data.unshift(0); }
 
-            if (data.length > 0) {
-                charts.history = new Chart(histCtx, {
-                    type: 'line',
-                    data: { labels: labels, datasets: [{ label: 'Net Worth (THB)', data: data, borderColor: '#00C805', backgroundColor: 'rgba(0, 200, 5, 0.1)', fill: true, tension: 0.3, pointRadius: 3 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } }, plugins: { legend: { display: false } } }
-                });
+                if (data.length > 0) {
+                    charts.history = new Chart(histCtx, {
+                        type: 'line',
+                        data: { labels: labels, datasets: [{ label: 'Net Worth (THB)', data: data, borderColor: '#00C805', backgroundColor: 'rgba(0, 200, 5, 0.1)', fill: true, tension: 0.3, pointRadius: 3 }] },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }, x: { grid: { display: false }, ticks: { color: '#9ca3af' } } }, plugins: { legend: { display: false } } }
+                    });
+                }
             }
         }
 
@@ -720,6 +759,7 @@
             if(activeBtn) { activeBtn.classList.add('tab-active'); activeBtn.classList.remove('text-gray-400'); }
 
             const container = document.getElementById('port-tab-content');
+            if(!container) return;
             container.innerHTML = '';
             
             let filteredTxs = filterType === 'All' ? state.transactions : state.transactions.filter(t => t.type === filterType || (filterType==='Overview' && t.type));
@@ -776,12 +816,13 @@
         function renderTransactions() {
             const tbody = document.getElementById('transactions-table');
             const empty = document.getElementById('tx-empty-state');
-            tbody.innerHTML = '';
+            if(tbody) tbody.innerHTML = '';
+            
             if (state.transactions.length === 0) { 
-                if (empty) empty.classList.remove('hidden'); 
+                if(empty) empty.classList.remove('hidden'); 
                 return; 
             }
-            if (empty) empty.classList.add('hidden');
+            if(empty) empty.classList.add('hidden');
 
             let sorted = [...state.transactions].sort((a,b) => {
                 let vA, vB;
@@ -808,6 +849,7 @@
                 return 0;
             });
 
+            if(!tbody) return;
             sorted.forEach(tx => {
                 let q = parseFloat(tx.qty); q = isNaN(q) ? 0 : q;
                 let p = parseFloat(tx.price); p = isNaN(p) ? 0 : p;
@@ -838,8 +880,8 @@
                             <span class="text-[10px] opacity-80">${formatNum(returnPct, 2)}%</span>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline"></i></button>
-                            <button onclick="deleteTx('${tx.id}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline"></i></button>
+                            <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline pointer-events-none"></i></button>
+                            <button onclick="deleteTx('${tx.id}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline pointer-events-none"></i></button>
                         </td>
                     </tr>
                 `;
@@ -848,30 +890,34 @@
             lucide.createIcons();
         }
 
-        // --- REBALANCE ---
         function renderRebalance() {
-            document.getElementById('tgt-crypto').value = state.targets['Crypto'] || 0;
-            document.getElementById('tgt-gold').value = state.targets['Gold'] || 0;
-            document.getElementById('tgt-set').value = state.targets['SET'] || 0;
-            document.getElementById('tgt-fixed').value = state.targets['Fixed'] || 0;
+            const tc = document.getElementById('tgt-crypto'); if(tc) tc.value = state.targets['Crypto'] || 0;
+            const tg = document.getElementById('tgt-gold'); if(tg) tg.value = state.targets['Gold'] || 0;
+            const ts = document.getElementById('tgt-set'); if(ts) ts.value = state.targets['SET'] || 0;
+            const tf = document.getElementById('tgt-fixed'); if(tf) tf.value = state.targets['Fixed'] || 0;
             calculateRebalance();
         }
 
         function calculateRebalance() {
             const stats = calculatePortfolio();
             const tbody = document.getElementById('rebalance-table');
+            if(!tbody) return;
             tbody.innerHTML = '';
             
             let sum = 0;
             ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
-                let val = parseFloat(document.getElementById(`tgt-${k.toLowerCase()}`).value);
+                const el = document.getElementById(`tgt-${k.toLowerCase()}`);
+                let val = el ? parseFloat(el.value) : 0;
                 val = isNaN(val) ? 0 : val;
                 state.targets[k] = val;
                 sum += val;
             });
 
-            if(Math.round(sum) !== 100) document.getElementById('rebalance-warning').classList.remove('hidden');
-            else document.getElementById('rebalance-warning').classList.add('hidden');
+            const rw = document.getElementById('rebalance-warning');
+            if(rw) {
+                if(Math.round(sum) !== 100) rw.classList.remove('hidden');
+                else rw.classList.add('hidden');
+            }
 
             ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
                 let currentVal = stats.assetMap[k] || 0;
@@ -900,7 +946,8 @@
         function handleTransactionSubmit(e) {
             e.preventDefault();
             try {
-                const id = document.getElementById('txId').value || Date.now().toString();
+                const idEl = document.getElementById('txId');
+                const id = (idEl && idEl.value) ? idEl.value : Date.now().toString();
                 
                 let rQty = parseFloat(document.getElementById('txQty').value);
                 let rPrice = parseFloat(document.getElementById('txPrice').value);
@@ -924,8 +971,10 @@
                 closeModal('addTransactionModal');
                 showToast('Asset transaction saved successfully');
                 
-                document.getElementById('onboarding-state').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
+                const obs = document.getElementById('onboarding-state');
+                const vds = document.getElementById('view-dashboard');
+                if(obs) obs.classList.add('hidden');
+                if(vds) vds.classList.remove('hidden');
                 
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
@@ -944,31 +993,118 @@
 
         function editTx(id) {
             const tx = state.transactions.find(t => t.id === id); if (!tx) return;
-            document.getElementById('txId').value = tx.id || ''; document.getElementById('txType').value = tx.type || 'Crypto';
-            document.getElementById('txName').value = tx.name || ''; document.getElementById('txDate').value = tx.date || '';
-            document.getElementById('txQty').value = tx.qty || 0; document.getElementById('txPrice').value = tx.price || 0;
-            document.getElementById('txCurrency').value = tx.currency || 'THB'; document.getElementById('txDividends').value = tx.dividends || 0;
-            document.getElementById('modal-title').innerText = "Edit Asset Transaction";
+            const idEl = document.getElementById('txId'); if(idEl) idEl.value = tx.id || ''; 
+            const tType = document.getElementById('txType'); if(tType) tType.value = tx.type || 'Crypto';
+            const tName = document.getElementById('txName'); if(tName) tName.value = tx.name || ''; 
+            const tDate = document.getElementById('txDate'); if(tDate) tDate.value = tx.date || '';
+            const tQty = document.getElementById('txQty'); if(tQty) tQty.value = tx.qty || 0; 
+            const tPrice = document.getElementById('txPrice'); if(tPrice) tPrice.value = tx.price || 0;
+            const tCurr = document.getElementById('txCurrency'); if(tCurr) tCurr.value = tx.currency || 'THB'; 
+            const tDiv = document.getElementById('txDividends'); if(tDiv) tDiv.value = tx.dividends || 0;
+            const mTitle = document.getElementById('modal-title'); if(mTitle) mTitle.innerText = "Edit Asset Transaction";
             openModal('addTransactionModal');
         }
 
         function openUpdatePrice(assetName) {
             if(!assetName) return;
-            document.getElementById('upd-asset-name').innerText = assetName.toUpperCase();
-            document.getElementById('upd-google-link').href = `https://www.google.com/search?q=${encodeURIComponent(`${assetName} stock price thb`)}`;
-            document.getElementById('upd-new-price').value = state.customPrices[assetName.toUpperCase()] || '';
-            document.getElementById('upd-asset-id').value = assetName.toUpperCase();
+            const nEl = document.getElementById('upd-asset-name'); if(nEl) nEl.innerText = assetName.toUpperCase();
+            const gEl = document.getElementById('upd-google-link'); if(gEl) gEl.href = `https://www.google.com/search?q=${encodeURIComponent(`${assetName} stock price thb`)}`;
+            const pEl = document.getElementById('upd-new-price'); if(pEl) pEl.value = state.customPrices[assetName.toUpperCase()] || '';
+            const iEl = document.getElementById('upd-asset-id'); if(iEl) iEl.value = assetName.toUpperCase();
             openModal('updatePriceModal');
         }
 
         function saveUpdatedPrice() {
-            let assetKey = document.getElementById('upd-asset-id').value, newPrice = parseFloat(document.getElementById('upd-new-price').value);
+            const idEl = document.getElementById('upd-asset-id');
+            const pEl = document.getElementById('upd-new-price');
+            if(!idEl || !pEl) return;
+            let assetKey = idEl.value, newPrice = parseFloat(pEl.value);
             if(!isNaN(newPrice) && newPrice >= 0) {
                 state.customPrices[assetKey] = newPrice; saveData();
                 showToast(`Price updated for ${assetKey}`); closeModal('updatePriceModal');
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             } else showToast('Invalid price entered', 'error');
+        }
+
+        // --- RETIREMENT CALCULATOR ---
+        function resetRetirementWealth() {
+            isManualRetirement = false;
+            updateRetirement(false);
+            showToast('Auto-Sync Restored');
+        }
+
+        function updateRetirement(manualInput = false) {
+            if (manualInput) isManualRetirement = true;
+
+            const stats = calculatePortfolio();
+            const principalInput = document.getElementById('ret-current-wealth');
+            
+            if (!isManualRetirement && principalInput) {
+                principalInput.value = stats.totalValue > 0 ? stats.totalValue.toFixed(2) : "0.00";
+            }
+
+            const principal = principalInput ? (parseFloat(principalInput.value) || 0) : 0;
+            
+            const usageEl = document.getElementById('ret-monthly-usage');
+            const retEl = document.getElementById('ret-return');
+            
+            const monthlyDraw = usageEl ? (parseFloat(usageEl.value) || 0) : 0;
+            const annualReturn = retEl ? ((parseFloat(retEl.value) || 0) / 100) : 0;
+            
+            const longEl = document.getElementById('ret-longevity');
+
+            if (principal <= 0 || monthlyDraw <= 0) {
+                if(longEl) {
+                    longEl.innerText = "0 Yrs, 0 Mos";
+                    longEl.className = "text-4xl md:text-5xl font-bold font-mono text-gray-500 mb-2";
+                }
+                if(charts.retirement) charts.retirement.destroy();
+                return;
+            }
+
+            let balance = principal;
+            let months = 0;
+            let history = [balance];
+            
+            while (balance > 0 && months < 1200) { 
+                balance = balance * (1 + (annualReturn / 12)) - monthlyDraw;
+                if (months % 12 === 0) history.push(Math.max(balance, 0));
+                months++;
+            }
+
+            if(longEl) {
+                if (months >= 1200) {
+                    longEl.innerText = "Forever! 🚀";
+                    longEl.className = "text-4xl md:text-5xl font-bold font-mono text-profit mb-2";
+                } else {
+                    let y = Math.floor(months / 12);
+                    let m = months % 12;
+                    longEl.innerText = `${y} Yrs, ${m} Mos`;
+                    longEl.className = `text-4xl md:text-5xl font-bold font-mono mb-2 ${y > 15 ? 'text-profit' : 'text-loss'}`;
+                }
+            }
+
+            const retCtxEl = document.getElementById('retirementChart');
+            if(retCtxEl) {
+                const retCtx = retCtxEl.getContext('2d');
+                if(charts.retirement) charts.retirement.destroy();
+                charts.retirement = new Chart(retCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: history.length}, (_, i) => `Yr ${i}`),
+                        datasets: [{
+                            label: 'Projected Wealth Balance',
+                            data: history,
+                            borderColor: '#2962FF',
+                            backgroundColor: 'rgba(41, 98, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { ticks: {color: '#6b7280'} }, y: { display: false } } }
+                });
+            }
         }
 
         // --- DATA SYNC ---
@@ -992,8 +1128,10 @@
                 if(obj.targets) state.targets = obj.targets;
                 saveData(); showToast('Data Synced Successfully!');
                 
-                document.getElementById('onboarding-state').classList.add('hidden');
-                document.getElementById('view-dashboard').classList.remove('hidden');
+                const obs = document.getElementById('onboarding-state');
+                const vds = document.getElementById('view-dashboard');
+                if(obs) obs.classList.add('hidden');
+                if(vds) vds.classList.remove('hidden');
                 
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
@@ -1008,13 +1146,21 @@
                 localStorage.removeItem('wealth_history'); localStorage.removeItem('wealth_targets');
                 state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
                 
-                document.getElementById('onboarding-state').classList.remove('hidden');
-                document.getElementById('view-dashboard').classList.add('hidden');
+                const obs = document.getElementById('onboarding-state');
+                const vds = document.getElementById('view-dashboard');
+                if(obs) obs.classList.remove('hidden');
+                if(vds) vds.classList.add('hidden');
                 
                 showToast('All local data wiped permanently.', 'success');
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             }
+        }
+
+        // --- BULLETPROOF UTILS ---
+        function formatNum(num, decimals = 2) {
+            if (isNaN(num) || num === null || num === undefined) num = 0;
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(num);
         }
 
         function flashUI(elementId) {
@@ -1032,8 +1178,8 @@
             m.classList.remove('hidden');
             setTimeout(() => {
                 m.classList.remove('opacity-0');
-                if(id==='addTransactionModal') document.getElementById('addTxBox').classList.remove('scale-95');
-                if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.remove('scale-95');
+                const b1 = document.getElementById('addTxBox'); if(b1) b1.classList.remove('scale-95');
+                const b2 = document.getElementById('updatePriceBox'); if(b2) b2.classList.remove('scale-95');
             }, 10);
         }
 
@@ -1041,23 +1187,27 @@
             const m = document.getElementById(id);
             if(!m) return;
             m.classList.add('opacity-0');
-            if(id==='addTransactionModal') document.getElementById('addTxBox').classList.add('scale-95');
-            if(id==='updatePriceModal') document.getElementById('updatePriceBox').classList.add('scale-95');
+            const b1 = document.getElementById('addTxBox'); if(b1) b1.classList.add('scale-95');
+            const b2 = document.getElementById('updatePriceBox'); if(b2) b2.classList.add('scale-95');
             setTimeout(() => { 
                 m.classList.add('hidden'); 
                 if(id==='addTransactionModal') {
-                    document.getElementById('txForm').reset();
-                    document.getElementById('txId').value = '';
-                    document.getElementById('modal-title').innerText = 'Add Asset Transaction';
+                    const form = document.getElementById('txForm'); if(form) form.reset();
+                    const iEl = document.getElementById('txId'); if(iEl) iEl.value = '';
+                    const mTitle = document.getElementById('modal-title'); if(mTitle) mTitle.innerText = 'Add Asset Transaction';
                 }
             }, 300);
         }
 
         function showToast(msg, type='success') {
             const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
+            if(!t) return;
+            const tMsg = document.getElementById('toast-msg');
+            if(tMsg) tMsg.innerText = msg;
             
             const iconContainer = document.getElementById('toast-icon-container');
+            if(!iconContainer) return;
+            
             if(type === 'success') {
                 t.className = "fixed bottom-5 right-5 glass-panel border-l-4 border-accent p-4 rounded shadow-lg transition-all duration-300 z-50 flex items-center space-x-3 pointer-events-none mx-4";
                 iconContainer.innerHTML = '<i data-lucide="check-circle" class="text-accent w-6 h-6"></i>';
@@ -1071,7 +1221,6 @@
             setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
 
-        // CSV Utils
         function exportCSV() {
             if(state.transactions.length === 0) return showToast("No transactions to export", "error");
             let csv = "Date,Type,Name,Qty,Price,Currency,Dividends\n";
@@ -1097,13 +1246,16 @@
                     if (parsedTxs.length > 0) { 
                         state.transactions = [...state.transactions, ...parsedTxs]; 
                         saveData(); showToast(`${count} transactions imported!`); 
-                        document.getElementById('onboarding-state').classList.add('hidden');
-                        document.getElementById('view-dashboard').classList.remove('hidden');
+                        const obs = document.getElementById('onboarding-state');
+                        const vds = document.getElementById('view-dashboard');
+                        if(obs) obs.classList.add('hidden');
+                        if(vds) vds.classList.remove('hidden');
                         const activeView = document.querySelector('.view-section.active');
                         if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
                     }
                 } catch (err) { showToast("Failed to parse CSV.", "error"); }
-                document.getElementById('csv-upload').value = ''; 
+                const cu = document.getElementById('csv-upload');
+                if(cu) cu.value = ''; 
             }; reader.readAsText(file);
         }
         function exportDataJSON() {
@@ -1120,12 +1272,15 @@
                     if(obj.transactions) state.transactions = obj.transactions; if(obj.customPrices) state.customPrices = obj.customPrices;
                     if(obj.history) state.history = obj.history; if(obj.targets) state.targets = obj.targets;
                     saveData(); showToast('Backup restored successfully'); 
-                    document.getElementById('onboarding-state').classList.add('hidden');
-                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    const obs = document.getElementById('onboarding-state');
+                    const vds = document.getElementById('view-dashboard');
+                    if(obs) obs.classList.add('hidden');
+                    if(vds) vds.classList.remove('hidden');
                     const activeView = document.querySelector('.view-section.active');
                     if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
                 } catch(err) { showToast('Invalid backup file', 'error'); }
-                document.getElementById('json-upload-backup').value = '';
+                const jub = document.getElementById('json-upload-backup');
+                if(jub) jub.value = '';
             }; reader.readAsText(file);
         }
 
