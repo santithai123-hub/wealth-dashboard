@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 2.3</title>
+    <title>WealthOS 2.4</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -47,6 +47,9 @@
         .view-section.active { display: block; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* FIX: Prevents icons/spans from stealing button clicks on desktop */
+        button i, button span { pointer-events: none; }
     </style>
 </head>
 <body class="overflow-hidden flex h-screen text-sm">
@@ -54,7 +57,7 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 glass-panel border-r border-gray-800 flex flex-col absolute md:relative z-30 h-full transition-transform transform -translate-x-full md:translate-x-0 bg-bgDark">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 pointer-events-none">
                 <i data-lucide="bar-chart-2" class="text-accent"></i>
                 <span class="font-bold text-lg tracking-wider">WEALTH<span class="text-accent">OS</span></span>
             </div>
@@ -81,7 +84,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 2.3 Live</span>
+            <span id="last-sync" class="opacity-70">Update 2.4 Live</span>
         </div>
     </aside>
 
@@ -97,16 +100,16 @@
                     <i data-lucide="menu"></i>
                 </button>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-usd-thb">
-                    <span class="text-gray-400 text-[10px] md:text-xs">USD/THB</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-usd-thb">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">USD/THB</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-usd-thb">--</span>
                 </div>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-btc-usd">
-                    <span class="text-gray-400 text-[10px] md:text-xs">BTC/USD</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-btc-usd">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">BTC/USD</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-btc-usd">--</span>
                 </div>
                 <div class="flex items-center space-x-2 px-2 rounded" id="ui-gold">
-                    <span class="text-gray-400 text-[10px] md:text-xs">TH Gold</span>
-                    <span class="font-mono font-semibold text-xs md:text-sm" id="ticker-gold">--</span>
+                    <span class="text-gray-400 text-[10px] md:text-xs pointer-events-none">TH Gold</span>
+                    <span class="font-mono font-semibold text-xs md:text-sm pointer-events-none" id="ticker-gold">--</span>
                 </div>
             </div>
             <div class="flex items-center space-x-2 md:space-x-3 ml-2 shrink-0">
@@ -124,33 +127,33 @@
 
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
-                <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
-                <h2 class="text-3xl font-bold">Welcome to WealthOS 2.3!</h2>
-                <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
+                <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto pointer-events-none"></i>
+                <h2 class="text-3xl font-bold pointer-events-none">Welcome to WealthOS 2.4!</h2>
+                <p class="text-gray-400 pointer-events-none">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
             
             <!-- VIEW: DASHBOARD -->
             <section id="view-dashboard" class="view-section active space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col pointer-events-none">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Net Worth</div>
                         <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-value">฿0.00</div>
                         <div class="flex justify-between text-xs mt-auto pt-3 border-t border-gray-800">
                             <span class="text-gray-500 whitespace-nowrap overflow-x-auto hide-scrollbar">Total Invested: <span id="dash-total-cost" class="font-mono text-gray-300">฿0.00</span></span>
                         </div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 min-w-0 flex flex-col pointer-events-none">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Total Return (Inc. Divs)</div>
                         <div class="text-xl sm:text-2xl lg:text-3xl font-mono font-bold mb-2 whitespace-nowrap overflow-x-auto hide-scrollbar tracking-tight" id="dash-total-pl">฿0.00</div>
                         <div class="text-sm font-mono font-medium mt-auto" id="dash-total-pl-pct">0.00%</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 flex flex-col pointer-events-none">
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider">Top Performing Asset</div>
                         <div class="text-lg sm:text-xl md:text-2xl font-bold mb-2 text-accent whitespace-nowrap overflow-x-auto hide-scrollbar" id="dash-top-asset">None</div>
                         <div class="text-sm text-gray-400 mt-auto">Based on Total Return</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 relative overflow-hidden flex flex-col pointer-events-none">
                         <div class="absolute right-0 top-0 opacity-10"><i data-lucide="pie-chart" class="w-24 h-24"></i></div>
                         <div class="text-gray-400 text-xs font-medium mb-1 uppercase tracking-wider z-10">Asset Count</div>
                         <div class="text-2xl sm:text-3xl font-mono font-bold text-gray-200 mb-2 z-10" id="dash-asset-count">0</div>
@@ -160,11 +163,11 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-panel p-5 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-semibold mb-4">Historical Net Worth</h3>
+                        <h3 class="text-lg font-semibold mb-4 pointer-events-none">Historical Net Worth</h3>
                         <div class="h-72 w-full"><canvas id="historyChart"></canvas></div>
                     </div>
                     <div class="glass-panel p-5 rounded-xl border border-gray-800">
-                        <h3 class="text-lg font-semibold mb-4">Asset Allocation</h3>
+                        <h3 class="text-lg font-semibold mb-4 pointer-events-none">Asset Allocation</h3>
                         <div class="h-64 w-full relative flex items-center justify-center"><canvas id="allocationChart"></canvas></div>
                     </div>
                 </div>
@@ -173,8 +176,8 @@
             <!-- VIEW: PORTFOLIO & ASSETS -->
             <section id="view-portfolio" class="view-section space-y-6">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
-                    <h2 class="text-xl font-semibold">Portfolio & Assets Breakdown</h2>
-                    <p class="text-sm text-gray-400">Your transactions grouped by asset to show total holdings.</p>
+                    <h2 class="text-xl font-semibold pointer-events-none">Portfolio & Assets Breakdown</h2>
+                    <p class="text-sm text-gray-400 pointer-events-none">Your transactions grouped by asset to show total holdings.</p>
                 </div>
                 
                 <div class="flex space-x-4 border-b border-gray-800 mb-6 overflow-x-auto hide-scrollbar">
@@ -192,8 +195,8 @@
             <section id="view-transactions" class="view-section space-y-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
-                        <h2 class="text-xl font-semibold">Transactions Log</h2>
-                        <p class="text-sm text-gray-400 mt-1">Click table headers to sort your data.</p>
+                        <h2 class="text-xl font-semibold pointer-events-none">Transactions Log</h2>
+                        <p class="text-sm text-gray-400 mt-1 pointer-events-none">Click table headers to sort your data.</p>
                     </div>
                 </div>
                 
@@ -201,14 +204,14 @@
                     <table class="w-full text-left text-sm whitespace-nowrap">
                         <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase cursor-pointer">
                             <tr>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('date')">Date <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 hover:text-white transition" onclick="sortTx('name')">Asset Name <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('qty')">Qty <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('cost')">Cost (Unit) <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('price')">Current Price <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('value')">Current Value <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('pnl')">Total Return <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-                                <th class="p-4 text-center">Actions</th>
+                                <th class="p-4 hover:text-white transition" onclick="sortTx('date')">Date <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 hover:text-white transition" onclick="sortTx('name')">Asset Name <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('qty')">Qty <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('cost')">Cost (Unit) <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('price')">Current Price <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('value')">Current Value <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-right hover:text-white transition" onclick="sortTx('pnl')">Total Return <i data-lucide="arrow-up-down" class="w-3 h-3 inline pointer-events-none"></i></th>
+                                <th class="p-4 text-center pointer-events-none">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
@@ -218,35 +221,35 @@
 
             <!-- VIEW: TARGET ALLOCATION (REBALANCE) -->
             <section id="view-rebalance" class="view-section space-y-6">
-                <h2 class="text-2xl font-semibold mb-2">Target Allocation & Rebalancing</h2>
-                <p class="text-gray-400 text-sm mb-6">Set your ideal portfolio percentages. We will calculate exactly what to buy or sell to hit your goal.</p>
+                <h2 class="text-2xl font-semibold mb-2 pointer-events-none">Target Allocation & Rebalancing</h2>
+                <p class="text-gray-400 text-sm mb-6 pointer-events-none">Set your ideal portfolio percentages. We will calculate exactly what to buy or sell to hit your goal.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Crypto Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Crypto Target (%)</label>
                         <input type="number" id="tgt-crypto" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Gold Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Gold Target (%)</label>
                         <input type="number" id="tgt-gold" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Thai Stocks (SET) Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Thai Stocks (SET) Target (%)</label>
                         <input type="number" id="tgt-set" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                     <div class="glass-panel p-4 rounded-xl border border-gray-800">
-                        <label class="block text-xs text-gray-400 mb-1">Fixed/Savings Target (%)</label>
+                        <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Fixed/Savings Target (%)</label>
                         <input type="number" id="tgt-fixed" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono outline-none" oninput="calculateRebalance()">
                     </div>
                 </div>
 
-                <div id="rebalance-warning" class="hidden bg-red-900/40 border border-red-500 text-red-200 p-4 rounded-xl mb-6">
+                <div id="rebalance-warning" class="hidden bg-red-900/40 border border-red-500 text-red-200 p-4 rounded-xl mb-6 pointer-events-none">
                     <strong>Warning:</strong> Your target percentages do not equal 100%. Please adjust them.
                 </div>
 
                 <div class="glass-panel rounded-xl overflow-hidden overflow-x-auto border border-gray-800">
                     <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase">
+                        <thead class="bg-gray-800/80 text-gray-400 text-xs uppercase pointer-events-none">
                             <tr>
                                 <th class="p-4">Asset Class</th>
                                 <th class="p-4">Current Allocation</th>
@@ -254,34 +257,34 @@
                                 <th class="p-4">Action Needed (THB)</th>
                             </tr>
                         </thead>
-                        <tbody id="rebalance-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
+                        <tbody id="rebalance-table" class="divide-y divide-gray-800 font-mono text-sm pointer-events-none"></tbody>
                     </table>
                 </div>
             </section>
 
             <!-- VIEW: RETIREMENT -->
             <section id="view-retirement" class="view-section space-y-6">
-                <h2 class="text-2xl font-semibold mb-2">Retirement Depletion Calculator</h2>
-                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses.</p>
+                <h2 class="text-2xl font-semibold mb-2 pointer-events-none">Retirement Depletion Calculator</h2>
+                <p class="text-gray-400 text-sm mb-6 pointer-events-none">Calculate how long your portfolio will last based on your monthly expenses.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Current Total Net Wealth</label>
-                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar" id="ret-current-wealth">฿0.00</div>
+                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Current Total Net Wealth</label>
+                            <div class="text-xl sm:text-2xl font-bold font-mono text-accent bg-gray-800/50 p-2 rounded whitespace-nowrap overflow-x-auto hide-scrollbar pointer-events-none" id="ret-current-wealth">฿0.00</div>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Monthly Expenses Target (THB)</label>
+                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Monthly Expenses Target (THB)</label>
                             <input type="number" id="ret-monthly-usage" value="50000" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Expected Annual Return (%)</label>
+                            <label class="block text-xs text-gray-400 mb-1 pointer-events-none">Expected Annual Return (%)</label>
                             <input type="number" id="ret-return" value="5.0" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                     </div>
                     
                     <div class="lg:col-span-2 space-y-6">
-                        <div class="glass-panel p-6 rounded-xl text-center border border-gray-800">
+                        <div class="glass-panel p-6 rounded-xl text-center border border-gray-800 pointer-events-none">
                             <div class="text-xs text-gray-400 uppercase tracking-wider mb-2">Your Wealth Will Last For</div>
                             <div class="text-4xl md:text-5xl font-bold font-mono text-profit mb-2" id="ret-longevity">0 Yrs, 0 Mos</div>
                         </div>
@@ -294,11 +297,11 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Update 2.3)</h2>
+                <h2 class="text-2xl font-semibold pointer-events-none">Settings & Backup (Update 2.4)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
-                    <p class="text-xs text-gray-400">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2 pointer-events-none">Sync Method 1: Using Text (Safest for Mobile)</h3>
+                    <p class="text-xs text-gray-400 pointer-events-none">Securely sync devices without creating files. Click Copy, send the text to yourself, and Paste it on the other device.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="copyDataText()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="copy" class="w-6 h-6 mb-2 text-yellow-400"></i>
@@ -312,7 +315,7 @@
                 </div>
 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
-                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 2: Local JSON Files</h3>
+                    <h3 class="font-medium text-lg border-b border-gray-800 pb-2 pointer-events-none">Sync Method 2: Local JSON Files</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <button onclick="exportDataJSON()" class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition border border-gray-700 w-full">
                             <i data-lucide="download-cloud" class="w-6 h-6 mb-2 text-blue-400"></i>
@@ -320,7 +323,7 @@
                         </button>
                         <div class="relative w-full">
                             <input type="file" id="json-upload-backup" accept=".json" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importDataJSON(event)">
-                            <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700">
+                            <div class="bg-gray-800 hover:bg-gray-700 p-4 rounded flex flex-col items-center justify-center transition h-full border border-gray-700 pointer-events-none">
                                 <i data-lucide="upload-cloud" class="w-6 h-6 mb-2 text-green-400"></i>
                                 <span class="text-sm font-medium">Restore (JSON File)</span>
                             </div>
@@ -401,13 +404,13 @@
     <div id="updatePriceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
         <div class="glass-panel w-full max-w-sm rounded-xl shadow-2xl p-6 border border-gray-700 transform scale-95 transition-transform mx-4" id="updatePriceBox">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">Update Market Price</h3>
+                <h3 class="text-lg font-bold" id="update-modal-title">Update Market Price</h3>
                 <button type="button" onclick="closeModal('updatePriceModal')" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
             </div>
             <p class="text-sm text-gray-300 mb-4">Set current price for <strong id="upd-asset-name" class="text-accent">Asset</strong> to calculate Profit/Loss.</p>
             
             <a id="upd-google-link" href="#" target="_blank" class="flex items-center justify-center w-full bg-white text-black font-semibold py-3 rounded mb-4 hover:bg-gray-200 transition">
-                <i data-lucide="search" class="w-4 h-4 mr-2"></i> Search Price on Google
+                <i data-lucide="search" class="w-4 h-4 mr-2 pointer-events-none"></i> <span class="pointer-events-none">Search Price on Google</span>
             </a>
 
             <div class="mb-4">
@@ -473,7 +476,6 @@
             initPWA();
             loadData();
             
-            // Instantly render UI (Do NOT await APIs to prevent freezing)
             nav('dashboard'); 
             
             if(state.transactions.length === 0) {
@@ -484,7 +486,6 @@
                 document.getElementById('view-dashboard').classList.remove('hidden');
             }
 
-            // Fetch live data silently in background
             fetchMarketData(); 
         }
 
@@ -520,13 +521,11 @@
             } catch(e) { console.error("Render Error in View " + viewId + ":", e); }
         }
 
-        // Safe Modal Opener (Fixed Mobile Crash)
         function openAddAssetModal() {
             try {
                 document.getElementById('txForm').reset();
                 document.getElementById('txId').value = '';
                 document.getElementById('modal-title').innerText = 'Add Asset Transaction';
-                // Bulletproof date assignment (replaces buggy valueAsDate)
                 document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
             } catch (e) {
                 console.warn("Form reset issue", e);
@@ -586,9 +585,8 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.3 (Offline Fallback)` : `Update 2.3 - Last sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('last-sync').innerText = offlineMode ? `Update 2.4 (Offline Fallback)` : `Update 2.4 - Last sync: ${new Date().toLocaleTimeString()}`;
             
-            // Take daily historical snapshot
             const stats = calculatePortfolio();
             takeSnapshot(stats);
             
@@ -717,7 +715,7 @@
             container.innerHTML = '';
             
             let filteredTxs = filterType === 'All' ? state.transactions : state.transactions.filter(t => t.type === filterType || (filterType==='Overview' && t.type));
-            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${filterType}.</div>`; return; }
+            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 pointer-events-none">No assets found in ${filterType}.</div>`; return; }
 
             let grouped = {};
             filteredTxs.forEach(tx => {
@@ -738,7 +736,7 @@
                 let isProfit = totalReturn >= 0;
 
                 let card = `
-                    <div class="glass-panel p-5 rounded-xl border border-gray-800">
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800 pointer-events-none">
                         <div class="flex justify-between items-start mb-4">
                             <div><h4 class="font-bold text-lg text-gray-200">${asset.name}</h4><span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span></div>
                             <div class="text-right"><div class="text-xs text-gray-500">Total Units</div><div class="font-mono font-semibold">${formatNum(asset.qty, 4)}</div></div>
@@ -807,12 +805,12 @@
                         <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (parseFloat(tx.qty) || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
-                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px]">Live</span>`}
+                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px] pointer-events-none">Live</span>`}
                         </td>
                         <td class="p-4 text-right font-bold text-gray-200">฿${formatNum(currentValThb, 2)}</td>
                         <td class="p-4 text-right font-bold ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}">
                             ${totalReturn >= 0 ? '+' : ''}฿${formatNum(totalReturn, 2)}<br>
-                            <span class="text-[10px] opacity-80">${returnPct.toFixed(2)}%</span>
+                            <span class="text-[10px] opacity-80 pointer-events-none">${returnPct.toFixed(2)}%</span>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
                             <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline"></i></button>
@@ -860,7 +858,7 @@
                 let actionColor = diff > 100 ? "text-profit" : (diff < -100 ? "text-loss" : "text-gray-400");
                 
                 let row = `
-                    <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+                    <tr class="border-b border-gray-800 hover:bg-gray-800/50 pointer-events-none">
                         <td class="p-4 font-bold text-gray-200">${k}</td>
                         <td class="p-4">${currentPct.toFixed(1)}% <span class="text-gray-500 text-xs">(฿${formatNum(currentVal, 0)})</span></td>
                         <td class="p-4 text-accent font-bold">${targetPct}% <span class="text-gray-500 text-xs font-normal">(฿${formatNum(targetVal, 0)})</span></td>
@@ -893,7 +891,6 @@
             closeModal('addTransactionModal');
             showToast('Asset transaction saved successfully');
             
-            // Auto-hide onboarding on first save
             document.getElementById('onboarding-state').classList.add('hidden');
             document.getElementById('view-dashboard').classList.remove('hidden');
             
