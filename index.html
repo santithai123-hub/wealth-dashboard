@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b0e14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WealthOS 3.0 (Stable)</title>
+    <title>WealthOS 3.1</title>
     
     <!-- Dynamic PWA Manifest Injection -->
     <link rel="manifest" id="dynamic-manifest">
@@ -81,7 +81,7 @@
             </button>
         </nav>
         <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex flex-col space-y-1">
-            <span id="last-sync" class="opacity-70">Update 3.0 (Stable)</span>
+            <span id="last-sync" class="opacity-70">Update 3.1</span>
         </div>
     </aside>
 
@@ -125,7 +125,7 @@
             <!-- ONBOARDING STATE -->
             <div id="onboarding-state" class="hidden glass-panel p-10 rounded-2xl text-center space-y-6 mt-10 max-w-2xl mx-auto border border-gray-800">
                 <i data-lucide="rocket" class="w-20 h-20 text-accent mx-auto"></i>
-                <h2 class="text-3xl font-bold">Welcome to WealthOS 3.0!</h2>
+                <h2 class="text-3xl font-bold">Welcome to WealthOS 3.1!</h2>
                 <p class="text-gray-400">Your journey to financial independence starts here. WealthOS is a professional, offline-first portfolio tracker. To begin generating your charts, add your first asset.</p>
                 <button onclick="openAddAssetModal()" class="bg-accent hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow-lg transition mt-4">Add First Asset</button>
             </div>
@@ -213,7 +213,7 @@
                         </thead>
                         <tbody id="transactions-table" class="divide-y divide-gray-800 font-mono text-sm"></tbody>
                     </table>
-                    <!-- 100% Guaranteed Empty State Div -->
+                    <!-- Guaranteed Empty State Div -->
                     <div id="tx-empty-state" class="text-center py-12 text-gray-500 hidden">
                         <i data-lucide="folder-open" class="mx-auto w-12 h-12 mb-3 opacity-50"></i>
                         No transactions found. Add an asset to get started.
@@ -267,7 +267,7 @@
             <!-- VIEW: RETIREMENT -->
             <section id="view-retirement" class="view-section space-y-6">
                 <h2 class="text-2xl font-semibold mb-2">Retirement Depletion Calculator</h2>
-                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses. You can type a custom amount to test "What-If" scenarios.</p>
+                <p class="text-gray-400 text-sm mb-6">Calculate how long your portfolio will last based on your monthly expenses. Type a custom starting amount to test "What-If" scenarios.</p>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="glass-panel p-5 rounded-xl space-y-5 border border-gray-800">
@@ -284,7 +284,7 @@
                             <input type="number" id="ret-monthly-usage" value="50000" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Expected Annual Return (%)</label>
+                            <label class="block text-xs text-gray-400 mb-1">Expected Annual Return (After Inflation %)</label>
                             <input type="number" id="ret-return" value="5.0" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm font-mono focus:border-accent outline-none" oninput="updateRetirement()">
                         </div>
                     </div>
@@ -303,7 +303,7 @@
 
             <!-- VIEW: SETTINGS -->
             <section id="view-settings" class="view-section space-y-6 max-w-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Settings & Backup (Version 3.0)</h2>
+                <h2 class="text-2xl font-semibold">Settings & Backup (Version 3.1)</h2>
                 
                 <div class="glass-panel p-6 rounded-xl space-y-4 border border-gray-800">
                     <h3 class="font-medium text-lg border-b border-gray-800 pb-2">Sync Method 1: Using Text (Safest for Mobile)</h3>
@@ -611,7 +611,7 @@
                 if(price && !isNaN(price)) market.prices[baseName] = price;
             }
 
-            if(ls) ls.innerText = offlineMode ? `Update 3.0 (Offline Fallback)` : `Update 3.0 - Last sync: ${new Date().toLocaleTimeString()}`;
+            if(ls) ls.innerText = offlineMode ? `Update 3.1 (Offline Fallback)` : `Update 3.1 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             try {
                 const stats = calculatePortfolio();
@@ -1027,7 +1027,7 @@
             } else showToast('Invalid price entered', 'error');
         }
 
-        // --- RETIREMENT CALCULATOR ---
+        // --- RETIREMENT CALCULATOR (Fixed Math Physics) ---
         function resetRetirementWealth() {
             isManualRetirement = false;
             updateRetirement(false);
@@ -1045,13 +1045,11 @@
             }
 
             const principal = principalInput ? (parseFloat(principalInput.value) || 0) : 0;
-            
             const usageEl = document.getElementById('ret-monthly-usage');
             const retEl = document.getElementById('ret-return');
             
             const monthlyDraw = usageEl ? (parseFloat(usageEl.value) || 0) : 0;
             const annualReturn = retEl ? ((parseFloat(retEl.value) || 0) / 100) : 0;
-            
             const longEl = document.getElementById('ret-longevity');
 
             if (principal <= 0 || monthlyDraw <= 0) {
@@ -1066,11 +1064,42 @@
             let balance = principal;
             let months = 0;
             let history = [balance];
-            
-            while (balance > 0 && months < 1200) { 
-                balance = balance * (1 + (annualReturn / 12)) - monthlyDraw;
-                if (months % 12 === 0) history.push(Math.max(balance, 0));
-                months++;
+            let monthlyRate = annualReturn / 12;
+            let isForever = false;
+
+            // Check if portfolio interest outpaces withdrawal
+            if (principal * monthlyRate >= monthlyDraw && monthlyDraw > 0) {
+                isForever = true;
+            }
+
+            if (isForever) {
+                // Calculate 30-year projection for readable chart
+                for (let i = 0; i < 360; i++) {
+                    balance = balance - monthlyDraw;
+                    balance = balance + (balance * monthlyRate);
+                    months++;
+                    if (months % 12 === 0) history.push(balance);
+                }
+                months = 1200; // Trigger Forever UI
+            } else {
+                // Proper Depletion Math (Beginning of month draw)
+                while (balance > 0 && months < 1200) { 
+                    balance = balance - monthlyDraw; 
+                    if (balance <= 0) {
+                        balance = 0;
+                        months++;
+                        break;
+                    }
+                    balance = balance + (balance * monthlyRate); 
+                    months++;
+                    
+                    if (months % 12 === 0) history.push(balance);
+                }
+                
+                // If it depleted mid-year, append the 0 so the chart visually drops
+                if (balance <= 0 && months % 12 !== 0) {
+                    history.push(0);
+                }
             }
 
             if(longEl) {
@@ -1085,6 +1114,17 @@
                 }
             }
 
+            let chartLabels = [];
+            for (let i = 0; i < history.length; i++) {
+                if (i === history.length - 1 && history[i] === 0) {
+                    let y = Math.floor(months / 12);
+                    let m = months % 12;
+                    chartLabels.push(`Yr ${y}, M ${m}`);
+                } else {
+                    chartLabels.push(`Yr ${i}`);
+                }
+            }
+
             const retCtxEl = document.getElementById('retirementChart');
             if(retCtxEl) {
                 const retCtx = retCtxEl.getContext('2d');
@@ -1092,17 +1132,26 @@
                 charts.retirement = new Chart(retCtx, {
                     type: 'line',
                     data: {
-                        labels: Array.from({length: history.length}, (_, i) => `Yr ${i}`),
+                        labels: chartLabels,
                         datasets: [{
                             label: 'Projected Wealth Balance',
                             data: history,
                             borderColor: '#2962FF',
                             backgroundColor: 'rgba(41, 98, 255, 0.1)',
                             fill: true,
-                            tension: 0.3
+                            tension: 0.3,
+                            pointRadius: 2
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { ticks: {color: '#6b7280'} }, y: { display: false } } }
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: {display: false} }, 
+                        scales: { 
+                            x: { ticks: {color: '#6b7280'} }, 
+                            y: { display: false, min: 0 } 
+                        } 
+                    }
                 });
             }
         }
