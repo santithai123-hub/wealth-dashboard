@@ -12,11 +12,11 @@
     <link rel="manifest" id="dynamic-manifest">
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src=https://cdn.tailwindcss.com></script>
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src=https://cdn.jsdelivr.net/npm/chart.js></script>
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src=https://unpkg.com/lucide@latest></script>
     
     <script>
         tailwind.config = {
@@ -368,7 +368,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Asset Symbol/Name *</label>
-                        <input type="text" id="txName" placeholder="e.g. BTC, PTT, SCB Savings" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required maxlength="40">
+                        <input type="text" id="txName" placeholder="e.g. BTC, PTT, SCB Savings" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm uppercase outline-none focus:border-accent" required>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -378,7 +378,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Quantity (Units) *</label>
-                        <input type="number" id="txQty" step="any" min="0.0000000001" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm outline-none focus:border-accent" required>
+                        <input type="number" id="txQty" step="any" min="0" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-sm outline-none focus:border-accent" required>
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-4">
@@ -395,7 +395,7 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-green-400 mb-1">Total Dividends/Interest Received (in Currency above)</label>
+                    <label class="block text-xs text-green-400 mb-1">Total Dividends/Interest Received (THB)</label>
                     <input type="number" id="txDividends" step="any" min="0" value="0" class="w-full bg-gray-800 border border-green-900/50 rounded p-3 text-sm outline-none focus:border-green-500">
                 </div>
                 <div class="pt-4 flex justify-end space-x-3 mt-4">
@@ -415,7 +415,7 @@
             </div>
             <p class="text-sm text-gray-300 mb-4">Set current price for <strong id="upd-asset-name" class="text-accent">Asset</strong> to calculate Profit/Loss.</p>
             
-            <a id="upd-google-link" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center w-full bg-white text-black font-semibold py-3 rounded mb-4 hover:bg-gray-200 transition">
+            <a id="upd-google-link" href="#" target="_blank" class="flex items-center justify-center w-full bg-white text-black font-semibold py-3 rounded mb-4 hover:bg-gray-200 transition">
                 <i data-lucide="search" class="w-4 h-4 mr-2"></i> Search Price on Google
             </a>
 
@@ -428,34 +428,6 @@
             <div class="flex justify-end space-x-2">
                 <button type="button" onclick="closeModal('updatePriceModal')" class="px-4 py-3 rounded text-sm hover:bg-gray-800 transition w-full md:w-auto">Cancel</button>
                 <button type="button" onclick="saveUpdatedPrice()" class="bg-accent hover:bg-blue-700 text-white px-4 py-3 rounded text-sm font-semibold transition w-full md:w-auto">Save Price</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirm Dialog (replaces blocking confirm()/prompt() for delete + sync paste) -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
-        <div class="glass-panel w-full max-w-sm rounded-xl shadow-2xl p-6 border border-gray-700 transform scale-95 transition-transform mx-4" id="confirmBox">
-            <h3 class="text-lg font-bold mb-2" id="confirm-title">Are you sure?</h3>
-            <p class="text-sm text-gray-300 mb-6" id="confirm-msg">This action cannot be undone.</p>
-            <div class="flex justify-end space-x-2">
-                <button type="button" onclick="closeModal('confirmModal')" class="px-4 py-3 rounded text-sm hover:bg-gray-800 transition w-full md:w-auto">Cancel</button>
-                <button type="button" id="confirm-ok-btn" class="bg-loss hover:bg-red-700 text-white px-4 py-3 rounded text-sm font-semibold transition w-full md:w-auto">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Paste Data Modal (replaces window.prompt for the data-sync string) -->
-    <div id="pasteDataModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity">
-        <div class="glass-panel w-full max-w-lg rounded-xl shadow-2xl p-6 border border-gray-700 transform scale-95 transition-transform mx-4" id="pasteDataBox">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">Paste Sync Data</h3>
-                <button type="button" onclick="closeModal('pasteDataModal')" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
-            </div>
-            <p class="text-sm text-gray-300 mb-4">Paste the data string from your other device below. This will <strong class="text-loss">overwrite</strong> all current data on this device.</p>
-            <textarea id="pasteDataInput" rows="5" class="w-full bg-gray-800 border border-gray-700 rounded p-3 text-xs font-mono outline-none focus:border-accent" placeholder="Paste data string here..."></textarea>
-            <div class="flex justify-end space-x-2 mt-4">
-                <button type="button" onclick="closeModal('pasteDataModal')" class="px-4 py-3 rounded text-sm hover:bg-gray-800 transition w-full md:w-auto">Cancel</button>
-                <button type="button" onclick="confirmPasteDataText()" class="bg-accent hover:bg-blue-700 text-white px-4 py-3 rounded text-sm font-semibold transition w-full md:w-auto">Sync Now</button>
             </div>
         </div>
     </div>
@@ -489,16 +461,6 @@
         let charts = { allocation: null, history: null, retirement: null };
         let txSort = { col: 'date', asc: false };
         let isManualRetirement = false;
-        let rebalanceSaveTimer = null;
-        let pendingDeleteId = null;
-
-        // --- Escaping helper: every place we interpolate user-entered text into
-        // innerHTML/insertAdjacentHTML must run it through this first. ---
-        function escapeHTML(str) {
-            const div = document.createElement('div');
-            div.textContent = String(str ?? '');
-            return div.innerHTML;
-        }
 
         function loadData() {
             try {
@@ -515,10 +477,7 @@
                 localStorage.setItem('wealth_custom_prices', JSON.stringify(state.customPrices));
                 localStorage.setItem('wealth_history', JSON.stringify(state.history));
                 localStorage.setItem('wealth_targets', JSON.stringify(state.targets));
-            } catch(e) {
-                console.error("Save Error", e);
-                showToast("Could not save data — local storage may be full.", "error");
-            }
+            } catch(e) { console.error("Save Error", e); }
         }
 
         function init() {
@@ -594,20 +553,13 @@
             openModal('addTransactionModal');
         }
 
-        // Small helper so a single slow/failed fetch can't hang the whole sync indefinitely
-        function fetchWithTimeout(url, opts = {}, ms = 8000) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), ms);
-            return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
-        }
-
         async function fetchMarketData() {
             const ls = document.getElementById('last-sync');
             if(ls) ls.innerText = "Syncing live data...";
             let offlineMode = false;
             
             try {
-                let erRes = await fetchWithTimeout('https://open.er-api.com/v6/latest/USD');
+                let erRes = await fetch('https://open.er-api.com/v6/latest/USD');
                 let erData = await erRes.json();
                 market.usd_thb = erData.rates.THB || 36.00;
                 const tu = document.getElementById('ticker-usd-thb');
@@ -620,7 +572,7 @@
             }
 
             try {
-                let r3 = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+                let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
                 let d3 = await r3.json();
                 market.prices['BTC'] = (d3.bitcoin.usd * market.usd_thb) || 0;
                 const tb = document.getElementById('ticker-btc-usd');
@@ -629,74 +581,37 @@
             } catch(e) { offlineMode = true; market.prices['BTC'] = 65000 * market.usd_thb; }
 
             try {
-                let r3 = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
+                let r3 = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
                 let d3 = await r3.json();
-                let spotUsdPerOz = d3['pax-gold'].usd;
-                if (!spotUsdPerOz || isNaN(spotUsdPerOz)) throw new Error('Invalid gold spot price from API');
-
-                // GOLD_BAHT_GRAMS: 1 Thai "baht weight" of gold = 15.244 grams (the standard
-                // unit Thai gold shops trade in — not to be confused with the THB currency).
-                // GOLD_THAI_PURITY: Thai gold bars/jewelry are traded at 96.5% purity, not the
-                // 99.99% "pure" spot price PAXG tracks, so we scale down by that ratio.
-                const GOLD_BAHT_GRAMS = 15.244;
-                const GOLD_THAI_PURITY = 0.965;
-                let pricePerGramUsd = spotUsdPerOz / 31.1034768;
-                let goldThb = pricePerGramUsd * GOLD_BAHT_GRAMS * market.usd_thb * GOLD_THAI_PURITY;
-                let computedGold = Math.round(goldThb / 50) * 50;
-
-                if (computedGold > 0) {
-                    market.prices['GOLD'] = computedGold;
-                    market.goldIsLive = true;
-                } else {
-                    throw new Error('Computed gold price was zero or invalid');
-                }
+                let goldThb = (d3['pax-gold'].usd / 31.1034768) * 15.244 * market.usd_thb * 0.965;
+                market.prices['GOLD'] = Math.round(goldThb / 50) * 50 || 0;
                 const tg = document.getElementById('ticker-gold');
                 if(tg) tg.innerText = `฿${formatNum(market.prices['GOLD'], 0)}`;
                 flashUI('ui-gold');
-            } catch(e) {
-                offlineMode = true;
-                market.goldIsLive = false;
-                // Previously this hard-coded a guess (฿40,000) that goes stale within months and
-                // can be wildly wrong (gold has traded above ฿65,000/baht for most of 2026).
-                // Safer behavior: keep whatever price we last successfully fetched (if any) and
-                // clearly mark it as not live, rather than overwriting it with a fabricated number.
-                const tg = document.getElementById('ticker-gold');
-                if (market.prices['GOLD'] > 0) {
-                    if(tg) tg.innerText = `฿${formatNum(market.prices['GOLD'], 0)} (stale)`;
-                } else {
-                    // We have never had a successful fetch this session — better to show "N/A"
-                    // than a plausible-looking but fabricated number.
-                    if(tg) tg.innerText = `N/A`;
-                }
-            }
+            } catch(e) { offlineMode = true; market.prices['GOLD'] = 40000; }
 
-            // SET stocks: fetched in parallel (was sequential) and each call is time-boxed,
-            // so a single stuck ticker/proxy can't slow down the whole refresh.
             let setAssets = new Set(state.transactions.filter(t => t.type === 'SET').map(t => (t.name || "").toUpperCase().trim()));
-            let setFetchFailed = false;
-            await Promise.all(Array.from(setAssets).map(async (baseName) => {
-                if(!baseName) return;
+            for (let baseName of setAssets) {
+                if(!baseName) continue;
                 let queryTicker = baseName.endsWith('.BK') ? baseName : baseName + '.BK';
                 let price = null;
-
+                
                 try {
-                    let res = await fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`, {}, 6000);
+                    let res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
                     if(res.ok) { let d = await res.json(); price = JSON.parse(d.contents).chart.result[0].meta.regularMarketPrice; }
                 } catch(e) {}
-
+                
                 if(!price) {
                     try {
-                        let res = await fetchWithTimeout(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`, {}, 6000);
+                        let res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + queryTicker)}`);
                         if(res.ok) { let parsed = await res.json(); price = parsed.chart.result[0].meta.regularMarketPrice; }
                     } catch(e) {}
                 }
 
                 if(price && !isNaN(price)) market.prices[baseName] = price;
-                else setFetchFailed = true;
-            }));
-            if (setFetchFailed) offlineMode = true;
+            }
 
-            if(ls) ls.innerText = offlineMode ? `Update 3.1 (Offline Fallback — some prices may be stale)` : `Update 3.1 - Last sync: ${new Date().toLocaleTimeString()}`;
+            if(ls) ls.innerText = offlineMode ? `Update 3.1 (Offline Fallback)` : `Update 3.1 - Last sync: ${new Date().toLocaleTimeString()}`;
             
             try {
                 const stats = calculatePortfolio();
@@ -717,29 +632,16 @@
             saveData();
         }
 
-        // tx.name is now treated case-insensitively but the original casing is preserved
-        // in storage (only used for grouping/lookup keys, never for display formatting).
         function getAssetMarketPrice(tx) {
             let n = (tx.name || "UNKNOWN").toUpperCase();
             if (tx.type === 'Crypto' && (n === 'BTC' || n === 'BITCOIN') && market.prices['BTC'] > 0) return market.prices['BTC'];
-            // A manual override (via the "Update Market Price" modal) always wins for Gold,
-            // so a user who knows the API is wrong/stale can correct it themselves.
-            if (tx.type === 'Gold' && state.customPrices['GOLD'] > 0) return state.customPrices['GOLD'];
             if (tx.type === 'Gold' && market.prices['GOLD'] > 0) return market.prices['GOLD'];
             if (tx.type === 'SET' && market.prices[n] > 0) return market.prices[n];
-            if (state.customPrices[n] > 0) return state.customPrices[n];
+            if (tx.type === 'SET' && market.prices[n + '.BK'] > 0) return market.prices[n + '.BK'];
+            if (state.customPrices[n]) return state.customPrices[n];
             
             let price = parseFloat(tx.price);
             return (isNaN(price) ? 0 : price) * (tx.currency === 'USD' ? market.usd_thb : 1);
-        }
-
-        // True only when we expect a live, non-stale feed for this asset. Used for the "Live" badge.
-        function isLiveAsset(tx) {
-            let n = (tx.name || "").toUpperCase();
-            if (tx.type === 'Crypto' && n === 'BTC') return true;
-            if (tx.type === 'Gold') return !!market.goldIsLive && !(state.customPrices['GOLD'] > 0);
-            if (tx.type === 'SET' && market.prices[n] > 0) return true;
-            return false;
         }
 
         function calculatePortfolio() {
@@ -752,16 +654,12 @@
                 q = isNaN(q) ? 0 : q;
                 d = isNaN(d) ? 0 : d;
 
-                // Dividends are entered in the same currency as the transaction, so they
-                // need the same THB conversion as the cost basis (previously always treated as THB).
-                let fx = (tx.currency === 'USD' ? market.usd_thb : 1);
-                let costThb = p * q * fx;
-                let dividendThb = d * fx;
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let currentValThb = getAssetMarketPrice(tx) * q;
 
                 totalCost += costThb;
                 totalValue += currentValThb;
-                totalDividends += dividendThb;
+                totalDividends += d;
 
                 if (!assetMap[tx.type]) assetMap[tx.type] = 0;
                 assetMap[tx.type] += currentValThb;
@@ -770,7 +668,7 @@
                 if(!grouped[name]) grouped[name] = { cost: 0, val: 0, div: 0 };
                 grouped[name].cost += costThb;
                 grouped[name].val += currentValThb;
-                grouped[name].div += dividendThb;
+                grouped[name].div += d;
             });
 
             let topAsset = "None", topAssetProfit = -Infinity;
@@ -865,7 +763,7 @@
             container.innerHTML = '';
             
             let filteredTxs = filterType === 'All' ? state.transactions : state.transactions.filter(t => t.type === filterType || (filterType==='Overview' && t.type));
-            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${escapeHTML(filterType)}.</div>`; return; }
+            if(filteredTxs.length === 0) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">No assets found in ${filterType}.</div>`; return; }
 
             let grouped = {};
             filteredTxs.forEach(tx => {
@@ -873,29 +771,25 @@
                 let p = parseFloat(tx.price), q = parseFloat(tx.qty), d = parseFloat(tx.dividends);
                 p = isNaN(p) ? 0 : p; q = isNaN(q) ? 0 : q; d = isNaN(d) ? 0 : d;
                 
-                let fx = (tx.currency === 'USD' ? market.usd_thb : 1);
-                let costThb = p * q * fx;
-                let dividendThb = d * fx;
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let currentValThb = getAssetMarketPrice(tx) * q;
 
                 if(!grouped[name]) grouped[name] = { name: name, type: tx.type, qty: 0, cost: 0, value: 0, div: 0 };
                 grouped[name].qty += q;
                 grouped[name].cost += costThb;
                 grouped[name].value += currentValThb;
-                grouped[name].div += dividendThb;
+                grouped[name].div += d;
             });
 
             Object.values(grouped).forEach(asset => {
                 let totalReturn = asset.value - asset.cost + asset.div;
                 let returnPct = asset.cost > 0 ? (totalReturn / asset.cost) * 100 : 0;
                 let isProfit = totalReturn >= 0;
-                let safeName = escapeHTML(asset.name);
-                let safeType = escapeHTML(asset.type || 'Unknown');
 
                 let card = `
                     <div class="glass-panel p-5 rounded-xl border border-gray-800">
                         <div class="flex justify-between items-start mb-4">
-                            <div><h4 class="font-bold text-lg text-gray-200">${safeName}</h4><span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${safeType}</span></div>
+                            <div><h4 class="font-bold text-lg text-gray-200">${asset.name}</h4><span class="text-[10px] text-gray-400 px-2 py-0.5 bg-gray-800 rounded border border-gray-700">${asset.type || 'Unknown'}</span></div>
                             <div class="text-right"><div class="text-xs text-gray-500">Total Units</div><div class="font-mono font-semibold">${formatNum(asset.qty, 4)}</div></div>
                         </div>
                         <div class="space-y-2">
@@ -960,36 +854,25 @@
                 let q = parseFloat(tx.qty); q = isNaN(q) ? 0 : q;
                 let p = parseFloat(tx.price); p = isNaN(p) ? 0 : p;
                 let d = parseFloat(tx.dividends); d = isNaN(d) ? 0 : d;
-                let fx = (tx.currency === 'USD' ? market.usd_thb : 1);
                 
-                let costThb = p * q * fx;
+                let costThb = p * q * (tx.currency === 'USD' ? market.usd_thb : 1);
                 let marketUnitThb = getAssetMarketPrice(tx);
                 let currentValThb = marketUnitThb * q;
-                let totalReturn = currentValThb - costThb + (d * fx);
+                let totalReturn = currentValThb - costThb + d;
                 let returnPct = costThb > 0 ? (totalReturn / costThb) * 100 : 0;
                 
                 let txNameUpper = (tx.name||"").toUpperCase();
-                let isAutoAsset = isLiveAsset(tx);
-                let safeId = escapeHTML(tx.id);
-                let safeName = escapeHTML(txNameUpper);
-                let safeType = escapeHTML(tx.type || 'Unknown');
-                // Used inside an inline onclick(...) string, so quotes/backslashes must also be neutralised
-                // (escapeHTML covers <>&"' for the HTML context; this covers the JS string-literal context).
-                let jsSafeName = (tx.name || "").replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-                // Gold has a single shared market price regardless of what the user named the
-                // transaction, so the override modal always keys off the literal 'GOLD' bucket
-                // rather than the asset's display name.
-                let overrideKey = tx.type === 'Gold' ? 'GOLD' : jsSafeName;
+                let isAutoAsset = (tx.type === 'Crypto' && (txNameUpper === 'BTC')) || tx.type === 'Gold' || (tx.type === 'SET' && (market.prices[txNameUpper] > 0 || market.prices[txNameUpper + '.BK'] > 0));
 
                 let row = `
                     <tr class="hover:bg-gray-800/50 transition border-b border-gray-800/50">
                         <td class="p-4 text-gray-400">${tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A'}</td>
-                        <td class="p-4"><div class="font-bold text-gray-200">${safeName}</div><div class="text-[10px] text-gray-500">${safeType}</div></td>
+                        <td class="p-4"><div class="font-bold text-gray-200">${txNameUpper}</div><div class="text-[10px] text-gray-500">${tx.type || 'Unknown'}</div></td>
                         <td class="p-4 text-right">${formatNum(q, 4)}</td>
                         <td class="p-4 text-right text-gray-400">฿${formatNum(costThb / (q || 1), 2)}</td>
                         <td class="p-4 text-right">
                             ฿${formatNum(marketUnitThb, 2)}
-                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${overrideKey}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px]">Live</span>`}
+                            ${!isAutoAsset ? `<button onclick="openUpdatePrice('${tx.name || ""}')" class="ml-2 text-gray-500 hover:text-accent"><i data-lucide="refresh-cw" class="w-3 h-3 inline"></i></button>` : `<span class="ml-2 text-accent text-[10px]">Live</span>`}
                         </td>
                         <td class="p-4 text-right font-bold text-gray-200">฿${formatNum(currentValThb, 2)}</td>
                         <td class="p-4 text-right font-bold ${totalReturn >= 0 ? 'text-profit' : 'text-loss'}">
@@ -997,8 +880,8 @@
                             <span class="text-[10px] opacity-80">${formatNum(returnPct, 2)}%</span>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="editTx('${safeId}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline pointer-events-none"></i></button>
-                            <button onclick="confirmDeleteTx('${safeId}', '${jsSafeName}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline pointer-events-none"></i></button>
+                            <button onclick="editTx('${tx.id}')" class="text-gray-500 hover:text-accent transition mr-3"><i data-lucide="edit" class="w-4 h-4 inline pointer-events-none"></i></button>
+                            <button onclick="deleteTx('${tx.id}')" class="text-gray-500 hover:text-loss transition"><i data-lucide="trash-2" class="w-4 h-4 inline pointer-events-none"></i></button>
                         </td>
                     </tr>
                 `;
@@ -1025,7 +908,7 @@
             ['Crypto', 'Gold', 'SET', 'Fixed'].forEach(k => {
                 const el = document.getElementById(`tgt-${k.toLowerCase()}`);
                 let val = el ? parseFloat(el.value) : 0;
-                val = isNaN(val) ? 0 : Math.max(0, val); // negative targets don't make sense
+                val = isNaN(val) ? 0 : val;
                 state.targets[k] = val;
                 sum += val;
             });
@@ -1056,10 +939,7 @@
                 `;
                 tbody.insertAdjacentHTML('beforeend', row);
             });
-
-            // Debounced save: typing a target no longer hits localStorage on every keystroke.
-            if (rebalanceSaveTimer) clearTimeout(rebalanceSaveTimer);
-            rebalanceSaveTimer = setTimeout(saveData, 400);
+            saveData();
         }
 
         // --- SAFE FORM ACTIONS ---
@@ -1072,22 +952,14 @@
                 let rQty = parseFloat(document.getElementById('txQty').value);
                 let rPrice = parseFloat(document.getElementById('txPrice').value);
                 let rDiv = parseFloat(document.getElementById('txDividends').value);
-
-                // Reject negative numbers explicitly instead of silently allowing them through.
-                if (isNaN(rQty) || rQty <= 0) { showToast('Quantity must be a positive number.', 'error'); return; }
-                if (isNaN(rPrice) || rPrice < 0) { showToast('Price cannot be negative.', 'error'); return; }
-                if (!isNaN(rDiv) && rDiv < 0) { showToast('Dividends cannot be negative.', 'error'); return; }
-
-                const rawName = (document.getElementById('txName').value || 'UNNAMED').trim().slice(0, 40);
-                if (!rawName) { showToast('Please enter an asset name.', 'error'); return; }
-
+                
                 const tx = {
                     id: id, 
                     type: document.getElementById('txType').value || 'Crypto',
-                    name: rawName,
+                    name: (document.getElementById('txName').value || 'UNNAMED').trim(),
                     date: document.getElementById('txDate').value || new Date().toISOString().split('T')[0],
-                    qty: rQty,
-                    price: rPrice,
+                    qty: isNaN(rQty) ? 0 : rQty,
+                    price: isNaN(rPrice) ? 0 : rPrice,
                     currency: document.getElementById('txCurrency').value || 'THB',
                     dividends: isNaN(rDiv) ? 0 : rDiv
                 };
@@ -1110,18 +982,6 @@
                 console.error("Save error:", err);
                 showToast("Error saving data. Please check inputs.", "error");
             }
-        }
-
-        // Delete now goes through a confirm dialog instead of deleting instantly on click.
-        function confirmDeleteTx(id, displayName) {
-            pendingDeleteId = id;
-            const titleEl = document.getElementById('confirm-title');
-            const msgEl = document.getElementById('confirm-msg');
-            if(titleEl) titleEl.innerText = 'Delete this transaction?';
-            if(msgEl) msgEl.innerText = `This will permanently delete "${displayName || 'this asset'}". This cannot be undone.`;
-            const okBtn = document.getElementById('confirm-ok-btn');
-            if(okBtn) okBtn.onclick = () => { deleteTx(pendingDeleteId); closeModal('confirmModal'); };
-            openModal('confirmModal');
         }
 
         function deleteTx(id) {
@@ -1148,13 +1008,7 @@
         function openUpdatePrice(assetName) {
             if(!assetName) return;
             const nEl = document.getElementById('upd-asset-name'); if(nEl) nEl.innerText = assetName.toUpperCase();
-            const gEl = document.getElementById('upd-google-link');
-            if(gEl) {
-                const query = assetName.toUpperCase() === 'GOLD'
-                    ? 'thai gold price per baht today สมาคมค้าทองคำ'
-                    : `${assetName} stock price thb`;
-                gEl.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            }
+            const gEl = document.getElementById('upd-google-link'); if(gEl) gEl.href = `https://www.google.com/search?q=${encodeURIComponent(`${assetName} stock price thb`)}`;
             const pEl = document.getElementById('upd-new-price'); if(pEl) pEl.value = state.customPrices[assetName.toUpperCase()] || '';
             const iEl = document.getElementById('upd-asset-id'); if(iEl) iEl.value = assetName.toUpperCase();
             openModal('updatePriceModal');
@@ -1173,7 +1027,7 @@
             } else showToast('Invalid price entered', 'error');
         }
 
-        // --- RETIREMENT CALCULATOR ---
+        // --- RETIREMENT CALCULATOR (Fixed Math Physics) ---
         function resetRetirementWealth() {
             isManualRetirement = false;
             updateRetirement(false);
@@ -1306,46 +1160,22 @@
         function copyDataText() {
             try {
                 const dataStr = btoa(encodeURIComponent(JSON.stringify(state)));
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(dataStr)
-                        .then(() => showToast("Data Copied! Paste this text into your other device."))
-                        .catch(() => legacyCopy(dataStr));
-                } else {
-                    legacyCopy(dataStr);
-                }
+                const textArea = document.createElement("textarea"); textArea.value = dataStr;
+                document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
+                showToast("Data Copied! Paste this text into your other device.");
             } catch (err) { showToast("Failed to copy data string.", "error"); }
         }
 
-        function legacyCopy(text) {
-            const textArea = document.createElement("textarea"); textArea.value = text;
-            textArea.style.position = "fixed"; textArea.style.opacity = "0";
-            document.body.appendChild(textArea); textArea.select();
-            try { document.execCommand('copy'); showToast("Data Copied! Paste this text into your other device."); }
-            catch(e) { showToast("Failed to copy data string.", "error"); }
-            document.body.removeChild(textArea);
-        }
-
-        // Replaces window.prompt() with the in-app pasteDataModal so it works the
-        // same way on mobile browsers that block/ignore prompt().
         function pasteDataText() {
-            const input = document.getElementById('pasteDataInput');
-            if (input) input.value = '';
-            openModal('pasteDataModal');
-        }
-
-        function confirmPasteDataText() {
-            const input = document.getElementById('pasteDataInput');
-            const raw = input ? input.value.trim() : '';
-            if (!raw) { showToast('Please paste a data string first.', 'error'); return; }
+            const input = prompt("Paste your Data String here to securely sync your devices:");
+            if (!input) return;
             try {
-                const obj = JSON.parse(decodeURIComponent(atob(raw)));
+                const obj = JSON.parse(decodeURIComponent(atob(input.trim())));
                 if(obj.transactions) state.transactions = obj.transactions;
                 if(obj.customPrices) state.customPrices = obj.customPrices;
                 if(obj.history) state.history = obj.history;
                 if(obj.targets) state.targets = obj.targets;
-                saveData();
-                closeModal('pasteDataModal');
-                showToast('Data Synced Successfully!');
+                saveData(); showToast('Data Synced Successfully!');
                 
                 const obs = document.getElementById('onboarding-state');
                 const vds = document.getElementById('view-dashboard');
@@ -1355,17 +1185,12 @@
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
             } catch(err) {
-                showToast("Paste Error: the text you pasted is invalid or incomplete.", "error");
+                alert("Paste Error: The text you pasted is invalid. Make sure you copied the entire string.");
             }
         }
 
         function clearAllData() {
-            const titleEl = document.getElementById('confirm-title');
-            const msgEl = document.getElementById('confirm-msg');
-            if(titleEl) titleEl.innerText = 'Wipe all local data?';
-            if(msgEl) msgEl.innerText = 'This will permanently delete every transaction, price override, and history snapshot on this device. This cannot be undone.';
-            const okBtn = document.getElementById('confirm-ok-btn');
-            if(okBtn) okBtn.onclick = () => {
+            if(confirm("Are you sure you want to delete ALL local data? This cannot be undone.")) {
                 localStorage.removeItem('wealth_txs'); localStorage.removeItem('wealth_custom_prices');
                 localStorage.removeItem('wealth_history'); localStorage.removeItem('wealth_targets');
                 state = { transactions: [], customPrices: {}, history: [], targets: { 'Crypto': 25, 'Gold': 15, 'SET': 40, 'Fixed': 20 } };
@@ -1375,12 +1200,10 @@
                 if(obs) obs.classList.remove('hidden');
                 if(vds) vds.classList.add('hidden');
                 
-                closeModal('confirmModal');
                 showToast('All local data wiped permanently.', 'success');
                 const activeView = document.querySelector('.view-section.active');
                 if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-            };
-            openModal('confirmModal');
+            }
         }
 
         // --- BULLETPROOF UTILS ---
@@ -1404,8 +1227,8 @@
             m.classList.remove('hidden');
             setTimeout(() => {
                 m.classList.remove('opacity-0');
-                const box = m.querySelector('.glass-panel');
-                if(box) box.classList.remove('scale-95');
+                const b1 = document.getElementById('addTxBox'); if(b1) b1.classList.remove('scale-95');
+                const b2 = document.getElementById('updatePriceBox'); if(b2) b2.classList.remove('scale-95');
             }, 10);
         }
 
@@ -1413,8 +1236,8 @@
             const m = document.getElementById(id);
             if(!m) return;
             m.classList.add('opacity-0');
-            const box = m.querySelector('.glass-panel');
-            if(box) box.classList.add('scale-95');
+            const b1 = document.getElementById('addTxBox'); if(b1) b1.classList.add('scale-95');
+            const b2 = document.getElementById('updatePriceBox'); if(b2) b2.classList.add('scale-95');
             setTimeout(() => { 
                 m.classList.add('hidden'); 
                 if(id==='addTransactionModal') {
@@ -1447,36 +1270,10 @@
             setTimeout(() => { t.classList.add('translate-y-20', 'opacity-0'); }, 3000);
         }
 
-        // Minimal RFC-4180-ish CSV line splitter: handles quoted fields containing commas,
-        // which the previous plain split(',') could not.
-        function parseCSVLine(line) {
-            let result = [];
-            let cur = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                let ch = line[i];
-                if (inQuotes) {
-                    if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
-                    else if (ch === '"') { inQuotes = false; }
-                    else { cur += ch; }
-                } else {
-                    if (ch === '"') inQuotes = true;
-                    else if (ch === ',') { result.push(cur); cur = ''; }
-                    else cur += ch;
-                }
-            }
-            result.push(cur);
-            return result.map(s => s.trim());
-        }
-
         function exportCSV() {
             if(state.transactions.length === 0) return showToast("No transactions to export", "error");
             let csv = "Date,Type,Name,Qty,Price,Currency,Dividends\n";
-            state.transactions.forEach(t => {
-                // Quote the name field since asset names could theoretically contain commas.
-                let safeName = `"${(t.name || '').replace(/"/g, '""')}"`;
-                csv += `${t.date},${t.type},${safeName},${t.qty},${t.price},${t.currency},${t.dividends||0}\n`;
-            });
+            state.transactions.forEach(t => csv += `${t.date},${t.type},${t.name},${t.qty},${t.price},${t.currency},${t.dividends||0}\n`);
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); a.download = 'wealth_transactions.csv'; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("CSV Exported");
         }
         function importCSV(e) {
@@ -1489,12 +1286,9 @@
                     if (lines.length <= 1) return showToast("No rows found.", "error");
                     let count = 0, parsedTxs = [];
                     for (let i = 1; i < lines.length; i++) {
-                        const row = parseCSVLine(lines[i]).map(item => item.replace(/^['"]+|['"]+$/g, '').trim());
+                        const row = lines[i].split(',').map(item => item.replace(/['"]+/g, '').trim());
                         if (row.length >= 6) {
-                            let qty = parseFloat(row[3]), price = parseFloat(row[4]), div = parseFloat(row[6]) || 0;
-                            let parsedDate = new Date(row[0]);
-                            if (isNaN(qty) || isNaN(price) || isNaN(parsedDate.getTime())) continue; // skip malformed rows instead of saving NaNs
-                            parsedTxs.push({ id: 'import_' + Date.now() + '_' + i, date: parsedDate.toISOString().split('T')[0], type: row[1], name: row[2].toUpperCase().slice(0, 40), qty: qty, price: price, currency: (row[5] || 'THB').toUpperCase(), dividends: div });
+                            parsedTxs.push({ id: 'import_' + Date.now() + i, date: new Date(row[0]).toISOString().split('T')[0], type: row[1], name: row[2].toUpperCase(), qty: parseFloat(row[3]), price: parseFloat(row[4]), currency: row[5].toUpperCase(), dividends: parseFloat(row[6])||0 });
                             count++;
                         }
                     }
@@ -1507,8 +1301,6 @@
                         if(vds) vds.classList.remove('hidden');
                         const activeView = document.querySelector('.view-section.active');
                         if(activeView) renderCurrentView(activeView.id.replace('view-', ''));
-                    } else {
-                        showToast("No valid rows could be imported.", "error");
                     }
                 } catch (err) { showToast("Failed to parse CSV.", "error"); }
                 const cu = document.getElementById('csv-upload');
